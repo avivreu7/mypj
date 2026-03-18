@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>תות-פליקס | שירי גן תות</title>
+    
+    <!-- PWA Meta Tags (התאמה למסך הבית) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TutFlix">
+    <meta name="theme-color" content="#141414">
+    <!-- מניפסט מקומי מובנה המאפשר הוספה למסך הבית כ"אפליקציה" עם אייקון של תות -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22TutFlix%20-%20%D7%A4%D7%A2%D7%95%D7%98%D7%95%D7%9F%20%D7%AA%D7%95%D7%AA%22%2C%22short_name%22%3A%22TutFlix%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23141414%22%2C%22theme_color%22%3A%22%23e50914%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB5PSI1MCUiIHgtPSI1MCUiIGZvbnQtc2l6ZT0iODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7wn42TPC90ZXh0Pjwvc3ZnPg%3D%3D%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #141414;
+            color: white;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* הסתרת פס גלילה */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .row-container {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .video-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            flex: 0 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .video-card:hover {
+                transform: scale(1.08);
+                z-index: 10;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+            }
+        }
+
+        /* מודל וידאו */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        /* אנימציות */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .slide-up { animation: slideUp 0.4s ease-out; }
+
+        @keyframes pulse-fast {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        .splash-logo { animation: pulse-fast 1.2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- מסך פתיחה (Splash Screen) -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] bg-[#141414] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="flex items-center gap-2 splash-logo">
+            <span class="text-5xl sm:text-7xl font-black text-red-600 tracking-tighter" style="text-shadow: 2px 2px 8px rgba(229,9,20,0.5);">TUTFLIX</span>
+            <span class="text-4xl sm:text-5xl drop-shadow-lg">🍓</span>
+        </div>
+        <div class="mt-8 text-gray-400 text-sm tracking-widest font-light opacity-80">טוען שירים...</div>
+    </div>
+
+    <!-- נאבבר -->
+    <nav id="navbar" class="fixed w-full z-40 transition-colors duration-300 bg-gradient-to-b from-black/90 to-transparent py-4 px-4 sm:px-8 flex flex-row justify-between items-center gap-2">
+        <!-- לוגו -->
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+            <span class="text-2xl sm:text-4xl font-black text-red-600 tracking-tighter" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">TUTFLIX</span>
+            <span class="text-lg sm:text-xl">🍓</span>
+        </div>
+
+        <!-- שורת חיפוש -->
+        <div class="flex items-center gap-2 bg-black/60 border border-gray-600 rounded-full px-3 py-1.5 focus-within:border-white transition-colors backdrop-blur-sm w-full max-w-[150px] sm:max-w-xs">
+            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" id="search-input" oninput="handleSearch()" placeholder="חיפוש שיר..." class="bg-transparent border-none outline-none text-white w-full placeholder-gray-400 text-xs sm:text-sm">
+        </div>
+    </nav>
+
+    <!-- אזור נושא מרכזי (Hero) -->
+    <div class="relative w-full h-[60vh] sm:h-[80vh] bg-cover bg-center" style="background-image: url('https://img.youtube.com/vi/_oQJSthHZn0/hqdefault.jpg');">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/50 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-12 pb-12 sm:pb-24 slide-up">
+            <h1 class="text-4xl sm:text-6xl font-black mb-2 text-white drop-shadow-lg">שיר בוקר שאהבנו</h1>
+            <p class="text-lg sm:text-xl text-gray-300 mb-6 drop-shadow-md max-w-lg hidden sm:block">מתחילים את היום עם חיוך! שיר הבוקר שהילדים בגן תות הכי אוהבים לרקוד ולשיר יחד.</p>
+            <div class="flex flex-wrap gap-3">
+                <!-- נגן עכשיו -->
+                <button onclick="openVideo('_oQJSthHZn0')" class="bg-white text-black font-bold py-2 px-5 sm:py-3 sm:px-8 rounded flex items-center gap-2 hover:bg-gray-200 transition shadow-lg">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                    <span>נגן עכשיו</span>
+                </button>
+                
+                <!-- כפתור "הפתיעו אותי" (Shuffle) -->
+                <button onclick="playRandomVideo()" class="bg-gray-600/70 text-white font-bold py-2 px-5 sm:py-3 sm:px-8 rounded flex items-center gap-2 hover:bg-gray-500 transition backdrop-blur-md shadow-lg border border-gray-500/50">
+                    <span class="text-lg">🎲</span>
+                    <span>הפתיעו אותי</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- מעטפת תוכן (לצורך הסתרה בזמן חיפוש) -->
+    <main class="relative z-10 -mt-8 sm:-mt-16 pb-20 px-0 sm:px-8 space-y-8 sm:space-y-12">
+        
+        <!-- תוצאות חיפוש (מוסתר כברירת מחדל) -->
+        <div id="search-results-section" class="hidden slide-up px-4 sm:px-0 min-h-[50vh]">
+            <h2 class="text-xl sm:text-2xl font-bold mb-4 text-gray-100">תוצאות חיפוש 🔍</h2>
+            <div id="search-grid" class="flex flex-wrap gap-4 sm:gap-6 justify-center sm:justify-start">
+                <!-- ימולא דינמית ע"י JS -->
+            </div>
+        </div>
+
+        <!-- תוכן רגיל (שורות קטגוריות) -->
+        <div id="main-content-wrapper" class="space-y-8 sm:space-y-12 block">
+            
+            <!-- שורת מועדפים (תוצג רק אם יש מועדפים) -->
+            <div id="favorites-section" class="hidden slide-up pl-4 sm:pl-0">
+                <h2 class="text-xl sm:text-2xl font-bold mb-3 px-4 sm:px-0">המועדפים שלי ❤️</h2>
+                <div id="favorites-row" class="row-container flex gap-3 overflow-x-auto hide-scrollbar px-4 sm:px-0 pb-4 snap-x snap-mandatory">
+                    <!-- ימולא ע"י JS -->
+                </div>
+            </div>
+
+            <!-- קטגוריות דינמיות -->
+            <div id="categories-container" class="space-y-8 sm:space-y-12">
+                <!-- ימולא ע"י JS -->
+            </div>
+
+        </div>
+    </main>
+
+    <!-- מודל צפייה בווידאו (Popup) -->
+    <div id="video-modal" class="fixed inset-0 z-[60] hidden modal-overlay flex flex-col items-center justify-center p-4 sm:p-8 opacity-0 transition-opacity duration-300">
+        <!-- כפתור סגירה -->
+        <button onclick="closeVideo()" class="absolute top-4 right-4 sm:top-8 sm:right-8 text-white hover:text-red-500 transition p-2 bg-black/50 rounded-full z-10">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        <div class="w-full max-w-4xl bg-black rounded-lg overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300" id="modal-content">
+            <!-- אזור הווידאו -->
+            <div class="relative w-full pt-[56.25%] bg-black"> <!-- יחס 16:9 -->
+                <!-- הוספנו מזהה ייחודי וכותרת לiframe לנגישות -->
+                <iframe id="youtube-player" title="נגן וידאו" class="absolute inset-0 w-full h-full" src="" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            
+            <!-- סרגל פעולות תחתון -->
+            <div class="p-4 sm:p-6 bg-[#181818] flex justify-between items-center">
+                <h3 id="modal-title" class="text-xl sm:text-2xl font-bold truncate pr-4 text-white">שם השיר</h3>
+                
+                <div class="flex gap-4 shrink-0">
+                    <!-- כפתור שיתוף -->
+                    <button id="share-btn" onclick="shareCurrentVideo()" class="flex flex-col items-center text-gray-400 hover:text-white transition group">
+                        <div class="p-3 rounded-full border border-gray-600 group-hover:border-white mb-1 bg-black/20">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-5.368m0 5.368a3 3 0 100-5.368m5.684-2.342a3 3 0 11-5.684 0 3 3 0 015.684 0m0 6.72a3 3 0 11-5.684 0 3 3 0 015.684 0z"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold">שתף</span>
+                    </button>
+
+                    <!-- כפתור מועדפים -->
+                    <button id="fav-btn" onclick="toggleCurrentFavorite()" class="flex flex-col items-center text-gray-400 hover:text-white transition group">
+                        <div id="fav-icon-container" class="p-3 rounded-full border border-gray-600 group-hover:border-white mb-1 bg-black/20">
+                            <svg class="w-5 h-5" id="fav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold" id="fav-text">רשימה</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- התראת טוסט (Toast) -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg font-bold text-sm z-[70] opacity-0 pointer-events-none transition-opacity duration-300 whitespace-nowrap">
+        הודעת טוסט
+    </div>
+
+    <script>
+        // --- מסד נתונים ---
+        const videoData = [
+            // בוקר ורוקדים
+            { id: 'PTifQ9YWUuE', cat: 'dance', title: 'שיר בוקר וריקוד' },
+            { id: 'V46OZHPJIIg', cat: 'dance', title: 'ריקוד בוקר משמח' },
+            { id: 'JCWSe0JShQI', cat: 'dance', title: 'שיר בוקר לפעוטות' },
+            { id: 'wv1d4H1HdOc', cat: 'dance', title: 'הפעלה וריקוד' },
+            { id: 'j4YuxF2siJ8', cat: 'dance', title: 'בוקר טוב לכולם' },
+            { id: 'lj95iZcHZ3w', cat: 'dance', title: 'ריקוד הבוקר שלנו' },
+            { id: '_oQJSthHZn0', cat: 'dance', title: 'שיר בוקר מרכזי' },
+            
+            // חורף וגשם
+            { id: 'u2yJkxT87_U', cat: 'winter', title: 'שיר גשם ראשון' },
+            { id: 'emT6y_324Xg', cat: 'winter', title: 'טיף וטף גשם' },
+            { id: '8fo8Qq7O0eo', cat: 'winter', title: 'רוקדים בגשם' },
+            
+            // חגי ישראל
+            { id: 'ys-Bbq27Lb4', cat: 'holidays', title: 'ראש השנה 1' },
+            { id: 'vv7XTuK9Qd8', cat: 'holidays', title: 'ראש השנה 2' },
+            { id: 'D_wfjUTnZqE', cat: 'holidays', title: 'חנוכה - סביבון' },
+            { id: 'y3cY4Wu4TMc', cat: 'holidays', title: 'חנוכה - חנוכיה' },
+            { id: 'QBseWYxCsnI', cat: 'holidays', title: 'חנוכה - באנו חושך' },
+            { id: 'vFD6w3ohfL4', cat: 'holidays', title: 'חנוכה שמח' },
+            { id: 'KMMR2-qD_6Y', cat: 'holidays', title: 'ט"ו בשבט - הגינה' },
+            { id: 'Hc_XbTlTEdY', cat: 'holidays', title: 'ט"ו בשבט - זרעונים' },
+            { id: 'XLYanV0ORNA', cat: 'holidays', title: 'ט"ו בשבט - עץ פרי' },
+            { id: 'IErHuCvUZUE', cat: 'holidays', title: 'ט"ו בשבט - צומח' },
+            { id: 'ifPCt2Sw6gA', cat: 'holidays', title: 'ט"ו בשבט - שתילה' },
+            { id: '8YZp2O-O0fU', cat: 'holidays', title: 'יום המשפחה 1' },
+            { id: 'yJBj5QIY6_0', cat: 'holidays', title: 'יום המשפחה 2' },
+            { id: '2_0EKcWOJ-0', cat: 'holidays', title: 'יום המשפחה 3' },
+            { id: 'Gul_Pj73Di8', cat: 'holidays', title: 'פורים - ליצן קטן' },
+            { id: '7sCEV0RdAt8', cat: 'holidays', title: 'פורים - מסכות' },
+            { id: 'ccmkuh-Xx8g', cat: 'holidays', title: 'פורים - רעשן' },
+            { id: '-Of1MtN8iPA', cat: 'holidays', title: 'פורים - חג גדול' },
+            
+            // שירים חדשים שהכרנו
+            { id: '23Wlwp9c1zA', cat: 'general', title: 'שיר חדש שהכרנו' },
+            { id: 'a_Tap6vyZ8g', cat: 'general', title: 'שיר הפעלה חדש' },
+            { id: 'u0l2nZD_k1o', cat: 'general', title: 'לומדים ושרים' },
+            { id: '1cB4HtK5JYE', cat: 'general', title: 'מנגינה וריקוד' },
+            { id: 'KeiCTmqMyvs', cat: 'general', title: 'שיר לפעוטות' },
+            { id: 'lUDJ9FzyyP4', cat: 'general', title: 'קצב ותנועה' }
+        ];
+
+        const categoriesConfig = [
+            { id: 'dance', title: 'בוקר טוב ורוקדים ☀️' },
+            { id: 'winter', title: 'חורף וגשם 🌧️' },
+            { id: 'holidays', title: 'חגי ישראל 🎉' },
+            { id: 'general', title: 'שירים חדשים שהכרנו 🎵' }
+        ];
+
+        let favorites = JSON.parse(localStorage.getItem('tutflix_favorites')) || [];
+        let currentOpenVideoId = null;
+
+        // --- פונקציות אתחול ---
+        function initApp() {
+            renderCategories();
+            renderFavorites();
+            
+            // הסרת מסך הפתיחה לאחר 1.5 שניות
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.classList.add('opacity-0');
+                setTimeout(() => splash.classList.add('hidden'), 700);
+            }, 1500);
+            
+            // אפקט שקיפות לנאבבר בגלילה
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    nav.classList.add('bg-[#141414]');
+                    nav.classList.remove('bg-gradient-to-b', 'from-black/90', 'to-transparent');
+                } else {
+                    nav.classList.remove('bg-[#141414]');
+                    nav.classList.add('bg-gradient-to-b', 'from-black/90', 'to-transparent');
+                }
+            });
+        }
+
+        // --- יצירת תצוגת שירים ---
+        function createVideoCard(video) {
+            return `
+                <div class="video-card relative w-36 sm:w-64 aspect-video rounded-md cursor-pointer snap-center group overflow-hidden bg-gray-800 flex-shrink-0" 
+                     onclick="openVideo('${video.id}')">
+                    <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" 
+                         alt="${video.title}" 
+                         class="w-full h-full object-cover"
+                         loading="lazy"
+                         onerror="this.src='https://via.placeholder.com/320x180/222/FFF?text=גן+תות'">
+                    
+                    <!-- טקסט חלופי קטן למקרה שהתמונה לא נטענת במובייל -->
+                    <div class="absolute bottom-1 right-2 text-white/50 text-xs sm:hidden pointer-events-none drop-shadow-md">
+                        ${video.title}
+                    </div>
+
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <svg class="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                    </div>
+                    
+                    <!-- פס אדום באפקט מעבר -->
+                    <div class="absolute bottom-0 left-0 h-1 bg-red-600 w-0 group-hover:w-full transition-all duration-300"></div>
+                </div>
+            `;
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories-container');
+            let html = '';
+
+            categoriesConfig.forEach(cat => {
+                const catVideos = videoData.filter(v => v.cat === cat.id);
+                if (catVideos.length === 0) return;
+
+                let cardsHtml = catVideos.map(v => createVideoCard(v)).join('');
+
+                html += `
+                    <div class="slide-up pl-4 sm:pl-0">
+                        <h2 class="text-lg sm:text-2xl font-bold mb-3 px-4 sm:px-0 text-gray-100">${cat.title}</h2>
+                        <div class="row-container flex gap-3 overflow-x-auto hide-scrollbar px-4 sm:px-0 pb-4 snap-x snap-mandatory">
+                            ${cardsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderFavorites() {
+            const favSection = document.getElementById('favorites-section');
+            const favRow = document.getElementById('favorites-row');
+            
+            if (favorites.length === 0) {
+                favSection.classList.add('hidden');
+                return;
+            }
+
+            favSection.classList.remove('hidden');
+            const favVideos = videoData.filter(v => favorites.includes(v.id));
+            favRow.innerHTML = favVideos.map(v => createVideoCard(v)).join('');
+        }
+
+        // --- חיפוש (Search) ---
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const mainContent = document.getElementById('main-content-wrapper');
+            const searchResultsSection = document.getElementById('search-results-section');
+            const searchGrid = document.getElementById('search-grid');
+
+            if (query.length === 0) {
+                mainContent.classList.remove('hidden');
+                searchResultsSection.classList.add('hidden');
+                return;
+            }
+
+            mainContent.classList.add('hidden');
+            searchResultsSection.classList.remove('hidden');
+
+            const filtered = videoData.filter(v => 
+                v.title.toLowerCase().includes(query) || 
+                categoriesConfig.find(c => c.id === v.cat).title.toLowerCase().includes(query)
+            );
+            
+            if (filtered.length === 0) {
+                searchGrid.innerHTML = `
+                    <div class="text-gray-400 col-span-full text-center py-10 w-full flex flex-col items-center gap-3">
+                        <span class="text-4xl">🤔</span>
+                        <p>לא נמצאו שירים תואמים לחיפוש...</p>
+                    </div>`;
+            } else {
+                searchGrid.innerHTML = filtered.map(v => createVideoCard(v)).join('');
+            }
+        }
+
+        // --- נגן וידאו והפעלה אקראית ---
+        function playRandomVideo() {
+            const randomIndex = Math.floor(Math.random() * videoData.length);
+            const randomVideo = videoData[randomIndex];
+            openVideo(randomVideo.id);
+            showToast('בוחר שיר באקראי... 🎲');
+        }
+
+        function openVideo(id) {
+            currentOpenVideoId = id;
+            const video = videoData.find(v => v.id === id);
+            
+            document.getElementById('modal-title').innerText = video ? video.title : 'שיר מגן תות';
+            document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+            
+            updateFavoriteModalUI();
+
+            const modal = document.getElementById('video-modal');
+            const content = document.getElementById('modal-content');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+            
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeVideo() {
+            const modal = document.getElementById('video-modal');
+            const content = document.getElementById('modal-content');
+            
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('youtube-player').src = ''; 
+                document.body.style.overflow = 'auto'; 
+                currentOpenVideoId = null;
+            }, 300);
+        }
+
+        document.getElementById('video-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeVideo();
+        });
+
+        // --- מועדפים ושיתוף ---
+        function updateFavoriteModalUI() {
+            const isFav = favorites.includes(currentOpenVideoId);
+            const favContainer = document.getElementById('fav-icon-container');
+            const favIcon = document.getElementById('fav-icon');
+            
+            if (isFav) {
+                favIcon.setAttribute('fill', 'currentColor');
+                favIcon.classList.add('text-red-600');
+                favContainer.classList.add('border-white', 'bg-black/40');
+            } else {
+                favIcon.setAttribute('fill', 'none');
+                favIcon.classList.remove('text-red-600');
+                favContainer.classList.remove('border-white', 'bg-black/40');
+            }
+        }
+
+        function toggleCurrentFavorite() {
+            if (!currentOpenVideoId) return;
+            
+            const index = favorites.indexOf(currentOpenVideoId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                showToast('הוסר מהרשימה שלי 🗑️');
+            } else {
+                favorites.push(currentOpenVideoId);
+                showToast('נוסף לרשימה שלי! ❤️');
+            }
+            
+            localStorage.setItem('tutflix_favorites', JSON.stringify(favorites));
+            updateFavoriteModalUI();
+            renderFavorites();
+        }
+
+        function shareCurrentVideo() {
+            if (!currentOpenVideoId) return;
+            
+            const video = videoData.find(v => v.id === currentOpenVideoId);
+            const url = `https://youtu.be/${currentOpenVideoId}`;
+            const shareData = {
+                title: 'שיר מגן תות 🍓',
+                text: `תראו את השיר "${video ? video.title : ''}" שהילדים שומעים בפעוטון תות!`,
+                url: url
+            };
+
+            if (navigator.share && /mobile|android|iphone/i.test(navigator.userAgent)) {
+                navigator.share(shareData).catch(console.error);
+            } else {
+                const el = document.createElement('textarea');
+                el.value = url;
+                el.setAttribute('readonly', '');
+                el.style.position = 'absolute';
+                el.style.left = '-9999px';
+                document.body.appendChild(el);
+                
+                const selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                
+                if (selected) {
+                    document.getSelection().removeAllRanges();
+                    document.getSelection().addRange(selected);
+                }
+                
+                showToast('הקישור הועתק ללוח! 📋');
+            }
+        }
+
+        // --- התראות (Toasts) ---
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        // התנעת המערכת
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
