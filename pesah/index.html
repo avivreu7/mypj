@@ -128,7 +128,7 @@ body {
   display: flex; align-items: center; gap: 30px; margin-bottom: 40px; 
   position: relative; z-index: 60; transition: all 0.4s ease; cursor: pointer;
   -webkit-tap-highlight-color: transparent; padding: 15px 10px; border-radius: 10px;
-  background: rgba(255, 255, 255, 0.001); /* This invisible background catches touches on mobile! */
+  background: rgba(255, 255, 255, 0.001);
 }
 .node.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 .node.avail { transform: translateX(10px); }
@@ -148,7 +148,7 @@ body {
 /* ================== ROOM VIEW ================== */
 #room-view {
   position: fixed; inset: 0; z-index: 200;
-  display: none; flex-direction: column; justify-content: center; align-items: center; /* Changed from flex to none default */
+  display: none; flex-direction: column; justify-content: center; align-items: center;
   padding: 20px; opacity: 0;
   background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.95) 80%), var(--theme-bg);
   transition: opacity 0.5s ease; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -266,7 +266,8 @@ body {
       </div>
       <button class="btn-epic" style="border-radius:30px; font-size:1.1rem; padding:10px 30px;" onclick="checkAnswer()">פענח סוד</button>
       
-      <div class="r-hint-wrap">
+      <!-- *** תיקון הבאג: הוספת id="r-hint-wrap" *** -->
+      <div class="r-hint-wrap" id="r-hint-wrap">
         <button class="r-hint-btn" id="hint-btn" onclick="toggleHint()">קול פנימי...</button>
         <div class="r-hint-text" id="r-hint"></div>
       </div>
@@ -483,7 +484,6 @@ function renderNodes() {
     const div = document.createElement('div');
     div.className = `node ${done ? 'done' : avail ? 'avail' : 'locked'}`;
     
-    // Binding Standard Event Listener
     if(avail || done) {
       div.addEventListener('click', function() {
         openRoom(i);
@@ -524,6 +524,7 @@ function openRoom(i) {
   const inp = document.getElementById('r-input');
   inp.value = ''; inp.classList.remove('shake');
   
+  // *** תיקון הבאג: כעת getElementById('r-hint-wrap') מוצא את האלמנט ***
   document.getElementById('r-hint-wrap').style.display = state.solved[i] ? 'none' : 'block';
   document.getElementById('r-hint').style.display = 'none';
   document.getElementById('r-hint').textContent = r.hi;
@@ -533,7 +534,7 @@ function openRoom(i) {
   setTimeout(() => {
     document.getElementById('map-view').style.display = 'none';
     const rv = document.getElementById('room-view');
-    rv.style.display = 'flex'; // Turn it on ONLY when needed
+    rv.style.display = 'flex';
     setTimeout(() => {
       rv.classList.add('active');
       rv.scrollTop = 0;
@@ -547,7 +548,7 @@ function closeRoom() {
   rv.classList.remove('active');
   startFX('none');
   setTimeout(() => {
-    rv.style.display = 'none'; // Turn it fully off
+    rv.style.display = 'none';
     const map = document.getElementById('map-view');
     map.style.display = 'block';
     setTimeout(() => map.style.opacity = 1, 50);
