@@ -116,44 +116,42 @@ body {
   display: none; opacity: 0; transition: opacity 1.5s ease;
 }
 
-/* z-index lowered to not block nodes on small screens */
 .map-header { text-align: center; margin-bottom: 80px; position: relative; z-index: 1; }
 .map-title { font-family: var(--font-epic); font-size: 3rem; color: var(--c-sand); margin-bottom: 5px; }
 .map-hiero { font-size: 1.5rem; letter-spacing: 15px; color: var(--c-gold-dim); opacity: 0.5; }
 
-/* Timeline given higher z-index to stay above everything */
 .timeline { max-width: 600px; margin: 0 auto; position: relative; z-index: 50; }
 .timeline-line { position: absolute; right: 39px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(180deg, var(--c-gold-dim), transparent); opacity: 0.3; z-index: 0; }
 
-/* NODE STYLING - FULLY CLICKABLE */
+/* NODE STYLING - FULLY CLICKABLE - FIXED FOR GHOST TOUCHES */
 .node { 
-  display: flex; align-items: center; gap: 30px; margin-bottom: 50px; 
+  display: flex; align-items: center; gap: 30px; margin-bottom: 40px; 
   position: relative; z-index: 60; transition: all 0.4s ease; cursor: pointer;
-  -webkit-tap-highlight-color: transparent; padding: 10px 0;
+  -webkit-tap-highlight-color: transparent; padding: 15px 10px; border-radius: 10px;
+  background: rgba(255, 255, 255, 0.001); /* This invisible background catches touches on mobile! */
 }
 .node.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 .node.avail { transform: translateX(10px); }
-.node.avail:hover, .node.avail:active { transform: translateX(20px); }
+.node.avail:hover, .node.avail:active { transform: translateX(20px); background: rgba(212,175,55,0.05); }
 
-/* Remove pointer-events from inner elements so the parent .node catches the click perfectly */
-.n-icon { width: 80px; height: 80px; border-radius: 5px; transform: rotate(45deg); background: var(--c-surface); border: 1px solid var(--c-sand-dark); display: flex; align-items: center; justify-content: center; transition: all 0.5s; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex-shrink: 0; z-index: 2; position: relative; pointer-events: none; }
-.n-icon-inner { transform: rotate(-45deg); font-size: 2rem; color: var(--c-sand); pointer-events: none; }
+.n-icon { width: 80px; height: 80px; border-radius: 5px; transform: rotate(45deg); background: var(--c-surface); border: 1px solid var(--c-sand-dark); display: flex; align-items: center; justify-content: center; transition: all 0.5s; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex-shrink: 0; z-index: 2; position: relative; }
+.n-icon-inner { transform: rotate(-45deg); font-size: 2rem; color: var(--c-sand); }
 
 .node.avail .n-icon { border-color: var(--c-gold); box-shadow: 0 0 20px rgba(212,175,55,0.2); }
 .node.done .n-icon { border-color: #4a5d23; background: #0b1205; }
 .node.done .n-icon-inner { color: #8fbc8f; }
 
-.n-content { flex: 1; text-align: right; pointer-events: none; }
+.n-content { flex: 1; text-align: right; }
 .n-ep { font-family: var(--font-ui); font-size: 0.9rem; color: var(--c-gold-dim); letter-spacing: 2px; display: block; margin-bottom: 5px; }
-.n-title { font-family: var(--font-epic); font-size: 1.8rem; color: var(--c-sand); font-weight: 300; }
+.n-title { font-family: var(--font-epic); font-size: 1.8rem; color: var(--c-sand); font-weight: 300; pointer-events: none; }
 
 /* ================== ROOM VIEW ================== */
 #room-view {
   position: fixed; inset: 0; z-index: 200;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  padding: 20px; opacity: 0; pointer-events: none;
+  display: none; flex-direction: column; justify-content: center; align-items: center; /* Changed from flex to none default */
+  padding: 20px; opacity: 0;
   background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.95) 80%), var(--theme-bg);
-  transition: opacity 0.8s ease; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  transition: opacity 0.5s ease; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 #room-view.active { opacity: 1; pointer-events: auto; }
 
@@ -197,23 +195,20 @@ body {
 
 /* ================== MOBILE ADJUSTMENTS ================== */
 @media(max-width: 600px) {
-  /* Prologue Mobile */
   .prologue-inner { padding: 40px 15px; justify-content: flex-start; }
   .prologue-title { font-size: 2rem; margin-top: 20px; }
   .prologue-text { font-size: 1.05rem; margin-bottom: 30px; text-align: right; }
   .prologue-rules { padding: 15px; margin-bottom: 30px; }
   .prologue-rules li { font-size: 1rem; margin-bottom: 10px; }
   
-  /* Map Mobile */
   .timeline-line { right: 29px; }
-  .node { gap: 15px; margin-bottom: 40px; transform: translateX(0); }
+  .node { gap: 15px; margin-bottom: 30px; transform: translateX(0); }
   .node.avail { transform: translateX(5px); }
   .node.avail:hover, .node.avail:active { transform: translateX(10px); }
   .n-icon { width: 60px; height: 60px; }
   .n-icon-inner { font-size: 1.5rem; }
   .n-title { font-size: 1.4rem; }
   
-  /* Room Mobile */
   .r-close { top: 10px; right: 10px; font-size: 2rem; }
   .r-input { font-size: 1.1rem; }
   .btn-epic { padding: 12px 25px; font-size: 1.1rem; }
@@ -453,7 +448,6 @@ function showPrologue() {
     splash.style.display = 'none';
     const prologue = document.getElementById('prologue-view');
     prologue.style.display = 'block';
-    // Pointer-events none trick to prevent blockings during transition
     splash.style.pointerEvents = 'none';
     setTimeout(() => prologue.style.opacity = 1, 50);
   }, 1000);
@@ -489,9 +483,11 @@ function renderNodes() {
     const div = document.createElement('div');
     div.className = `node ${done ? 'done' : avail ? 'avail' : 'locked'}`;
     
-    // Explicit hardcoded click event that passes directly to the function
+    // Binding Standard Event Listener
     if(avail || done) {
-      div.setAttribute('onclick', `openRoom(${i})`);
+      div.addEventListener('click', function() {
+        openRoom(i);
+      });
     }
     
     div.innerHTML = `
@@ -513,8 +509,7 @@ function renderNodes() {
   }
 }
 
-// Must be global for inline onclick
-window.openRoom = function(i) {
+function openRoom(i) {
   currentRoom = i;
   const r = RIDDLES[i];
   
@@ -538,21 +533,25 @@ window.openRoom = function(i) {
   setTimeout(() => {
     document.getElementById('map-view').style.display = 'none';
     const rv = document.getElementById('room-view');
-    rv.classList.add('active');
-    rv.scrollTop = 0;
-    
+    rv.style.display = 'flex'; // Turn it on ONLY when needed
+    setTimeout(() => {
+      rv.classList.add('active');
+      rv.scrollTop = 0;
+    }, 50);
     document.getElementById('r-interaction').style.display = state.solved[i] ? 'none' : 'block';
   }, 500);
-};
+}
 
 function closeRoom() {
-  document.getElementById('room-view').classList.remove('active');
+  const rv = document.getElementById('room-view');
+  rv.classList.remove('active');
   startFX('none');
   setTimeout(() => {
+    rv.style.display = 'none'; // Turn it fully off
     const map = document.getElementById('map-view');
     map.style.display = 'block';
     setTimeout(() => map.style.opacity = 1, 50);
-  }, 800);
+  }, 500);
 }
 
 function toggleHint() {
@@ -582,8 +581,11 @@ function checkAnswer() {
     localStorage.setItem('exodus_cinematic', JSON.stringify(state));
     inp.blur();
     
-    document.getElementById('room-view').classList.remove('active');
+    const rv = document.getElementById('room-view');
+    rv.classList.remove('active');
+    
     setTimeout(() => {
+      rv.style.display = 'none';
       document.getElementById('rev-text').innerHTML = r.ex;
       const rev = document.getElementById('reveal-view');
       rev.style.display = 'flex'; rev.scrollTop = 0;
