@@ -38,7 +38,7 @@ body {
 /* ================== GLOBAL FX ================== */
 #fx-canvas {
   position: fixed; inset: 0; width: 100%; height: 100%;
-  z-index: 1; pointer-events: none; opacity: 0;
+  z-index: 0; pointer-events: none; opacity: 0;
   transition: opacity 2s ease;
 }
 
@@ -47,15 +47,16 @@ body {
   background: transparent; border: 1px solid var(--c-gold); color: var(--c-gold);
   padding: 15px 40px; font-family: var(--font-ui); font-size: 1.2rem; letter-spacing: 2px;
   cursor: pointer; position: relative; overflow: hidden; transition: all 0.5s;
-  z-index: 10;
+  z-index: 10; border-radius: 5px;
+  -webkit-tap-highlight-color: transparent;
 }
 .btn-epic::before {
   content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
   background: linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent);
   transition: all 0.5s; z-index: -1;
 }
-.btn-epic:hover { background: rgba(212,175,55,0.1); box-shadow: 0 0 20px rgba(212,175,55,0.3); transform: translateY(-2px); }
-.btn-epic:hover::before { left: 100%; transition: all 0.8s; }
+.btn-epic:hover, .btn-epic:active { background: rgba(212,175,55,0.1); box-shadow: 0 0 20px rgba(212,175,55,0.3); transform: translateY(-2px); }
+.btn-epic:hover::before, .btn-epic:active::before { left: 100%; transition: all 0.8s; }
 
 /* ================== SPLASH SCREEN ================== */
 #splash-view {
@@ -82,22 +83,26 @@ body {
 /* ================== PROLOGUE / INSTRUCTIONS ================== */
 #prologue-view {
   position: fixed; inset: 0; z-index: 900;
-  background: #050505; display: none; flex-direction: column; justify-content: center; align-items: center;
-  padding: 30px; opacity: 0; transition: opacity 1.5s ease; overflow-y: auto; text-align: center;
+  background: #050505; display: none; overflow-y: auto; opacity: 0; transition: opacity 1.5s ease;
+  -webkit-overflow-scrolling: touch;
+}
+.prologue-inner {
+  max-width: 800px; margin: 0 auto; padding: 60px 20px; text-align: center;
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
 }
 .prologue-title {
-  font-family: var(--font-epic); font-size: 2.5rem; color: var(--c-gold); margin-bottom: 30px;
-  border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px;
+  font-family: var(--font-epic); font-size: 2.5rem; color: var(--c-gold); margin-bottom: 25px;
+  border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; width: 100%; max-width: 400px;
 }
 .prologue-text {
-  font-size: 1.2rem; line-height: 1.8; color: var(--c-sand); max-width: 700px; font-weight: 300; margin-bottom: 40px;
+  font-size: 1.2rem; line-height: 1.8; color: var(--c-sand); font-weight: 300; margin-bottom: 40px; text-align: center;
 }
 .prologue-rules {
-  text-align: right; max-width: 600px; margin: 0 auto 50px; background: rgba(212,175,55,0.05);
+  text-align: right; width: 100%; margin: 0 auto 40px; background: rgba(212,175,55,0.05);
   padding: 25px; border-radius: 10px; border-right: 3px solid var(--c-gold);
 }
 .prologue-rules li {
-  margin-bottom: 15px; font-size: 1.1rem; list-style: none; position: relative; padding-right: 25px;
+  margin-bottom: 15px; font-size: 1.1rem; list-style: none; position: relative; padding-right: 25px; color: #fff;
 }
 .prologue-rules li::before {
   content: '✦'; position: absolute; right: 0; color: var(--c-gold-dim); font-size: 1.2rem;
@@ -116,12 +121,17 @@ body {
 .map-hiero { font-size: 1.5rem; letter-spacing: 15px; color: var(--c-gold-dim); opacity: 0.5; }
 
 .timeline { max-width: 600px; margin: 0 auto; position: relative; z-index: 20; }
-.timeline-line { position: absolute; right: 39px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(180deg, var(--c-gold-dim), transparent); opacity: 0.3; z-index: -1; }
+.timeline-line { position: absolute; right: 39px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(180deg, var(--c-gold-dim), transparent); opacity: 0.3; z-index: 0; }
 
-.node { display: flex; align-items: center; gap: 30px; margin-bottom: 50px; position: relative; transition: all 0.4s ease; cursor: pointer; }
+/* NODE STYLING - FIXED FOR CLICKS */
+.node { 
+  display: flex; align-items: center; gap: 30px; margin-bottom: 50px; 
+  position: relative; z-index: 30; transition: all 0.4s ease; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; padding: 10px 0;
+}
 .node.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 .node.avail { transform: translateX(10px); }
-.node.avail:hover { transform: translateX(20px); }
+.node.avail:hover, .node.avail:active { transform: translateX(20px); }
 
 .n-icon { width: 80px; height: 80px; border-radius: 5px; transform: rotate(45deg); background: var(--c-surface); border: 1px solid var(--c-sand-dark); display: flex; align-items: center; justify-content: center; transition: all 0.5s; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex-shrink: 0; z-index: 2; position: relative; }
 .n-icon-inner { transform: rotate(-45deg); font-size: 2rem; color: var(--c-sand); pointer-events: none; }
@@ -130,8 +140,8 @@ body {
 .node.done .n-icon { border-color: #4a5d23; background: #0b1205; }
 .node.done .n-icon-inner { color: #8fbc8f; }
 
-.n-content { flex: 1; text-align: right; pointer-events: none; }
-.n-ep { font-family: var(--font-ui); font-size: 0.9rem; color: var(--c-gold-dim); letter-spacing: 2px; }
+.n-content { flex: 1; text-align: right; pointer-events: auto; /* Fixed: allows clicking the text */ }
+.n-ep { font-family: var(--font-ui); font-size: 0.9rem; color: var(--c-gold-dim); letter-spacing: 2px; display: block; margin-bottom: 5px; }
 .n-title { font-family: var(--font-epic); font-size: 1.8rem; color: var(--c-sand); font-weight: 300; }
 
 /* ================== ROOM VIEW ================== */
@@ -140,14 +150,14 @@ body {
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   padding: 20px; opacity: 0; pointer-events: none;
   background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.95) 80%), var(--theme-bg);
-  transition: opacity 0.8s ease; overflow-y: auto;
+  transition: opacity 0.8s ease; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 #room-view.active { opacity: 1; pointer-events: auto; }
 
-.r-close { position: absolute; top: 30px; right: 30px; background: none; border: none; color: var(--c-sand); font-size: 2rem; cursor: pointer; transition: all 0.3s; z-index: 60; opacity: 0.5; }
-.r-close:hover { opacity: 1; transform: scale(1.1); }
+.r-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--c-sand); font-size: 2.5rem; cursor: pointer; transition: all 0.3s; z-index: 60; opacity: 0.6; -webkit-tap-highlight-color: transparent; }
+.r-close:hover, .r-close:active { opacity: 1; transform: scale(1.1); }
 
-.r-container { max-width: 800px; width: 100%; position: relative; z-index: 55; text-align: center; }
+.r-container { max-width: 800px; width: 100%; position: relative; z-index: 55; text-align: center; margin: auto; padding-top: 40px; }
 
 .r-num { font-family: var(--font-ui); font-size: 1rem; letter-spacing: 5px; color: var(--theme-main); opacity: 0.7; margin-bottom: 20px; display: block; }
 .r-title { font-family: var(--font-epic); font-size: clamp(2.5rem, 6vw, 4rem); color: var(--c-sand); margin-bottom: 40px; font-weight: 300; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
@@ -155,7 +165,7 @@ body {
 .r-riddle { font-family: var(--font-epic); font-size: clamp(1.4rem, 4vw, 2.2rem); line-height: 1.6; color: #fff; text-shadow: 0 2px 10px #000; margin-bottom: 60px; padding: 0 10px; font-weight: 300; }
 
 .r-input-wrap { position: relative; max-width: 400px; margin: 0 auto 30px; }
-.r-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--c-sand-dark); padding: 15px 20px; font-family: var(--font-ui); font-size: 1.3rem; color: var(--c-sand); text-align: center; outline: none; transition: all 0.4s; }
+.r-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--c-sand-dark); padding: 15px 20px; font-family: var(--font-ui); font-size: 1.3rem; color: var(--c-sand); text-align: center; outline: none; transition: all 0.4s; border-radius: 0; }
 .r-input::placeholder { color: rgba(232, 213, 181, 0.2); font-weight: 300; }
 .r-input:focus { border-color: var(--theme-main); border-bottom-width: 2px; }
 .r-input.shake { animation: shakeError 0.5s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--c-red); color: var(--c-red); }
@@ -163,33 +173,47 @@ body {
 @keyframes shakeError { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
 
 .r-hint-wrap { margin-top: 30px; min-height: 40px; }
-.r-hint-btn { background: none; border: none; color: var(--c-gold-dim); font-family: var(--font-ui); cursor: pointer; font-size: 1rem; transition: color 0.3s; opacity: 0.6; }
-.r-hint-btn:hover { opacity: 1; }
-.r-hint-text { display: none; font-size: 1.1rem; color: var(--c-sand); font-style: italic; animation: fadeIn 0.5s; font-family: var(--font-epic); }
+.r-hint-btn { background: none; border: none; color: var(--c-gold-dim); font-family: var(--font-ui); cursor: pointer; font-size: 1rem; transition: color 0.3s; opacity: 0.6; text-decoration: underline; -webkit-tap-highlight-color: transparent; padding: 10px; }
+.r-hint-btn:hover, .r-hint-btn:active { opacity: 1; }
+.r-hint-text { display: none; font-size: 1.1rem; color: var(--c-sand); font-style: italic; animation: fadeIn 0.5s; font-family: var(--font-epic); padding: 0 15px; }
 
 /* ================== REVEAL & VICTORY ================== */
-.overlay-view { position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 20px; text-align: center; animation: fadeIn 1s ease; overflow-y: auto; }
+.overlay-view { position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 20px; text-align: center; animation: fadeIn 1s ease; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.overlay-inner { max-width: 600px; margin: auto; padding: 40px 0; }
 
 .rev-title { font-family: var(--font-epic); font-size: 3rem; color: var(--theme-main); margin-bottom: 30px; font-weight: 300; }
-.rev-text { font-family: var(--font-ui); font-size: 1.3rem; color: var(--c-text); max-width: 600px; line-height: 1.8; margin-bottom: 50px; font-weight: 300; }
+.rev-text { font-family: var(--font-ui); font-size: 1.3rem; color: var(--c-text); line-height: 1.8; margin-bottom: 50px; font-weight: 300; }
 .rev-text strong { color: var(--c-sand); font-weight: 500; font-size: 1.1em; }
 
 .v-title { font-family: var(--font-epic); font-size: clamp(4rem, 12vw, 7rem); color: var(--c-gold); margin-bottom: 20px; line-height: 1; text-shadow: 0 0 40px rgba(212,175,55,0.4); }
 
-.rst { display: block; margin: 50px auto; background: none; border: none; color: var(--c-gold-dim); cursor: pointer; font-family: var(--font-ui); letter-spacing: 1px; opacity: 0.5; transition: 0.3s; position: relative; z-index: 20; }
+.rst { display: block; margin: 50px auto; background: none; border: none; color: var(--c-gold-dim); cursor: pointer; font-family: var(--font-ui); letter-spacing: 1px; opacity: 0.5; transition: 0.3s; padding: 15px; -webkit-tap-highlight-color: transparent; text-decoration: underline; }
 .rst:hover { opacity: 1; }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* ================== MOBILE ================== */
+/* ================== MOBILE ADJUSTMENTS ================== */
 @media(max-width: 600px) {
+  /* Prologue Mobile */
+  .prologue-inner { padding: 40px 15px; justify-content: flex-start; }
+  .prologue-title { font-size: 2rem; margin-top: 20px; }
+  .prologue-text { font-size: 1.05rem; margin-bottom: 30px; text-align: right; }
+  .prologue-rules { padding: 15px; margin-bottom: 30px; }
+  .prologue-rules li { font-size: 1rem; margin-bottom: 10px; }
+  
+  /* Map Mobile */
   .timeline-line { right: 29px; }
-  .node { gap: 20px; }
+  .node { gap: 15px; margin-bottom: 40px; transform: translateX(0); }
+  .node.avail { transform: translateX(5px); }
+  .node.avail:hover, .node.avail:active { transform: translateX(10px); }
   .n-icon { width: 60px; height: 60px; }
   .n-icon-inner { font-size: 1.5rem; }
   .n-title { font-size: 1.4rem; }
-  .r-close { top: 15px; right: 15px; font-size: 1.5rem; }
-  .prologue-text, .prologue-rules li { font-size: 1rem; }
+  
+  /* Room Mobile */
+  .r-close { top: 10px; right: 10px; font-size: 2rem; }
+  .r-input { font-size: 1.1rem; }
+  .btn-epic { padding: 12px 25px; font-size: 1.1rem; }
 }
 </style>
 </head>
@@ -204,17 +228,19 @@ body {
 </div>
 
 <div id="prologue-view">
-  <div class="prologue-title">דברי ימי גושן</div>
-  <div class="prologue-text">
-    דורות שלמים כורעים בני עמנו תחת נטל הפירמידות והשעבוד של פרעה. 
-    אך רוח של שינוי מנשבת מן המדבר. הדרך אל החירות לא תיכבש בכוח הזרוע בלבד, אלא בתבונה, באמונה ובהבנת העבר. לפניכם מגילת המסע.
+  <div class="prologue-inner">
+    <div class="prologue-title">דברי ימי גושן</div>
+    <div class="prologue-text">
+      דורות שלמים כורעים בני עמנו תחת נטל הפירמידות והשעבוד של פרעה. 
+      אך רוח של שינוי מנשבת מן המדבר. הדרך אל החירות לא תיכבש בכוח הזרוע בלבד, אלא בתבונה, באמונה ובהבנת העבר. לפניכם מגילת המסע.
+    </div>
+    <ul class="prologue-rules">
+      <li><strong>הדרך נעולה:</strong> תוכלו להתקדם לתחנה הבאה רק לאחר שתפענחו את סוד התחנה הנוכחית.</li>
+      <li><strong>קראו בין השורות:</strong> התשובות אינן מונחות על פני השטח. חפשו את המשמעות הסמלית המסתתרת בכל חידה.</li>
+      <li><strong>האזינו לקול הפנימי:</strong> נתקעתם בדרך? לחצו על "קול פנימי..." כדי לקבל הכוונה משמעותית.</li>
+    </ul>
+    <button class="btn-epic" onclick="startJourney()">שאו את המטה</button>
   </div>
-  <ul class="prologue-rules">
-    <li><strong>הדרך נעולה:</strong> תוכלו להתקדם לתחנה הבאה רק לאחר שתפענחו את סוד התחנה הנוכחית.</li>
-    <li><strong>קראו בין השורות:</strong> התשובות אינן מונחות על פני השטח. הקדישו זמן לחשיבה וחפשו את המשמעות הסמלית המסתתרת בכל חידה.</li>
-    <li><strong>האזינו לקול הפנימי:</strong> נתקעתם בדרך? לחצו על "קול פנימי..." כדי לקבל הכוונה משמעותית.</li>
-  </ul>
-  <button class="btn-epic" onclick="startJourney()">שאו את המטה</button>
 </div>
 
 <div id="map-view">
@@ -240,7 +266,7 @@ body {
       <div class="r-input-wrap">
         <input type="text" id="r-input" class="r-input" placeholder="חשפו את התשובה..." autocomplete="off">
       </div>
-      <button class="btn-epic" style="border-radius:30px; font-size:1rem; padding:10px 30px;" onclick="checkAnswer()">פענח סוד</button>
+      <button class="btn-epic" style="border-radius:30px; font-size:1.1rem; padding:10px 30px;" onclick="checkAnswer()">פענח סוד</button>
       
       <div class="r-hint-wrap">
         <button class="r-hint-btn" id="hint-btn" onclick="toggleHint()">קול פנימי...</button>
@@ -251,19 +277,23 @@ body {
 </div>
 
 <div id="reveal-view" class="overlay-view">
-  <div class="rev-title">הסוד נחשף</div>
-  <div class="rev-text" id="rev-text"></div>
-  <button class="btn-epic" onclick="continueMap()">המשך בדרך</button>
+  <div class="overlay-inner">
+    <div class="rev-title">הסוד נחשף</div>
+    <div class="rev-text" id="rev-text"></div>
+    <button class="btn-epic" onclick="continueMap()">המשך בדרך</button>
+  </div>
 </div>
 
 <div id="victory-view" class="overlay-view" style="background: radial-gradient(circle, #001a33, #000);">
-  <div class="v-title">חירות</div>
-  <div class="rev-text" style="font-size:1.4rem;">
-    עברתם את המדבר, שברתם את שלשלאות העבר וקראתם את ים סוף.<br><br>
-    המסע האמיתי של העם מתחיל עכשיו.<br>
-    <strong style="color:var(--c-gold);">חג חירות שמח.</strong>
+  <div class="overlay-inner">
+    <div class="v-title">חירות</div>
+    <div class="rev-text" style="font-size:1.4rem;">
+      עברתם את המדבר, שברתם את שלשלאות העבר וקראתם את ים סוף.<br><br>
+      המסע האמיתי של העם מתחיל עכשיו.<br>
+      <strong style="color:var(--c-gold);">חג חירות שמח.</strong>
+    </div>
+    <button class="btn-epic" onclick="resetGame()">שובו למצרים</button>
   </div>
-  <button class="btn-epic" onclick="resetGame()">שובו למצרים</button>
 </div>
 
 <script>
@@ -420,7 +450,7 @@ function showPrologue() {
   setTimeout(() => {
     splash.style.display = 'none';
     const prologue = document.getElementById('prologue-view');
-    prologue.style.display = 'flex';
+    prologue.style.display = 'block';
     setTimeout(() => prologue.style.opacity = 1, 50);
   }, 1000);
 }
@@ -454,9 +484,9 @@ function renderNodes() {
     const div = document.createElement('div');
     div.className = `node ${done ? 'done' : avail ? 'avail' : 'locked'}`;
     
-    // Explicitly binding click event to open room
+    // Explicit click listener for touch screens
     if(avail || done) {
-      div.onclick = function() { openRoom(i); };
+      div.addEventListener('click', () => openRoom(i));
     }
     
     div.innerHTML = `
@@ -533,7 +563,6 @@ function toggleHint() {
 }
 
 function normalize(s) {
-  // Remove punctuation, extra spaces, and trim
   return s.trim().replace(/[.,!?"'״]/g, '').replace(/\s+/g, ' ');
 }
 
