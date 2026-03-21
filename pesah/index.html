@@ -2,661 +2,534 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>מבצע אפיקומן: עשר המכות</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Heebo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>נסיך מצרים — מסע אל החירות</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
+/* ================== CSS VARIABLES & RESET ================== */
 :root {
-  --gold: #d4af37;
-  --gold-light: #f0d45a;
-  --gold-dark: #8a6f1a;
-  --bg: #07070f;
-  --bg-card: #0e0e1c;
-  --bg-modal: #12121f;
-  --crimson: #7a1515;
-  --crimson-bright: #c0392b;
-  --text: #ddd8c4;
-  --muted: #6a6450;
-  --success: #1e6641;
-  --success-light: #3dba72;
-  --border: rgba(212,175,55,0.18);
+  --c-bg: #0b0c10;
+  --c-surface: #1f2833;
+  --c-text: #c5c6c7;
+  --c-gold: #d4af37;
+  --c-gold-dim: #a67c00;
+  --c-sand: #e8d5b5;
+  --c-sand-dark: #8c7b64;
+  --c-red: #8b0000;
+  --c-blue: #003366;
+  
+  --font-epic: 'Frank Ruhl Libre', serif;
+  --font-ui: 'Heebo', sans-serif;
+  
+  --theme-main: var(--c-gold);
+  --theme-bg: var(--c-bg);
 }
-* { box-sizing: border-box; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+input { user-select: auto; }
 
 body {
-  font-family: 'Heebo', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  margin: 0; padding: 0;
-  min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse 60% 40% at 15% 15%, rgba(122,21,21,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 85% 85%, rgba(212,175,55,0.05) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4af37' fill-opacity='0.025'%3E%3Cpath d='M40 0L0 40 40 80 80 40z'/%3E%3C/g%3E%3C/svg%3E");
+  font-family: var(--font-ui);
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
-/* ── HEADER ── */
-header {
-  background: linear-gradient(180deg, #110505 0%, #07070f 100%);
-  border-bottom: 1px solid var(--gold-dark);
-  padding: 36px 20px 30px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-header::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent 0%, var(--gold) 35%, var(--crimson-bright) 50%, var(--gold) 65%, transparent 100%);
-}
-header::after {
-  content: '𓂀  𓋹  𓂀';
-  position: absolute;
-  bottom: 8px; left: 50%; transform: translateX(-50%);
-  color: var(--gold-dark); font-size: 0.8rem; letter-spacing: 14px; opacity: 0.4;
-}
-.h-title {
-  font-family: 'Frank Ruhl Libre', serif;
-  font-size: clamp(1.8rem, 5vw, 2.8rem);
-  font-weight: 900;
-  color: var(--gold);
-  margin: 0 0 6px;
-  letter-spacing: 2px;
-  text-shadow: 0 0 40px rgba(212,175,55,0.35);
-}
-.h-sub {
-  font-size: 0.85rem;
-  font-weight: 300;
-  color: var(--muted);
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin: 0;
+/* ================== GLOBAL FX ================== */
+#fx-canvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; opacity: 0;
+  transition: opacity 2s ease;
 }
 
-/* ── LAYOUT ── */
-.wrap { max-width: 1080px; width: 95%; margin: 0 auto; padding: 40px 0 70px; }
-
-.mission {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px 26px;
-  margin-bottom: 38px;
-  background: rgba(212,175,55,0.03);
-  position: relative;
-  font-size: 1.02rem;
-  line-height: 1.85;
+/* ================== SPLASH SCREEN ================== */
+#splash-view {
+  position: fixed; inset: 0; z-index: 1000;
+  background: radial-gradient(circle at center, #1a1610 0%, #000 100%);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  transition: opacity 1.5s ease;
 }
-.mission::before {
-  content: '⬥ משימה ⬥';
-  position: absolute; top: -11px; right: 20px;
-  background: var(--bg); padding: 0 10px;
-  font-size: 0.72rem; color: var(--gold); letter-spacing: 4px; font-weight: 700;
+.splash-logo {
+  font-family: var(--font-epic); font-size: clamp(3rem, 10vw, 7rem);
+  color: var(--c-sand); text-align: center; font-weight: 900;
+  text-shadow: 0 0 30px rgba(212,175,55,0.4);
+  letter-spacing: 2px; margin-bottom: 20px;
+  background: linear-gradient(to bottom, #fff, var(--c-gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: slowScale 10s infinite alternate;
 }
-
-/* ── PUZZLE GRID ── */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-  margin-bottom: 48px;
+.splash-sub {
+  font-family: var(--font-ui); font-size: 1.2rem; color: var(--c-gold-dim);
+  letter-spacing: 8px; text-transform: uppercase; margin-bottom: 60px;
 }
-@media(max-width:750px){ .grid { grid-template-columns: repeat(2, 1fr); } }
-
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 28px 14px 22px;
-  cursor: pointer;
-  transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
-  position: relative;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  min-height: 148px; overflow: hidden;
+.btn-epic {
+  background: transparent; border: 1px solid var(--c-gold); color: var(--c-gold);
+  padding: 15px 40px; font-family: var(--font-ui); font-size: 1.2rem; letter-spacing: 2px;
+  cursor: pointer; position: relative; overflow: hidden; transition: all 0.5s;
 }
-.card::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(212,175,55,0.07) 0%, transparent 55%);
-  opacity: 0; transition: opacity 0.28s;
-  border-radius: inherit;
-}
-.card:hover::after { opacity: 1; }
-.card:hover {
-  border-color: rgba(212,175,55,0.65);
-  transform: translateY(-7px);
-  box-shadow: 0 18px 44px rgba(0,0,0,0.55), 0 0 0 1px rgba(212,175,55,0.25), 0 0 24px rgba(212,175,55,0.08);
-}
-.card.solved {
-  border-color: rgba(61,186,114,0.35);
-  background: linear-gradient(135deg, rgba(30,102,65,0.12) 0%, var(--bg-card) 100%);
-  pointer-events: none;
-}
-.card-num {
-  position: absolute; top: 10px; right: 13px;
-  font-size: 0.68rem; color: var(--muted); font-family: monospace; letter-spacing: 1px;
-}
-.card-icon { font-size: 2.8rem; margin-bottom: 11px; filter: drop-shadow(0 0 6px rgba(212,175,55,0.25)); }
-.card-label {
-  font-family: 'Frank Ruhl Libre', serif;
-  font-size: 0.95rem; font-weight: 700;
-  color: var(--gold); text-align: center; line-height: 1.3;
-}
-.solved-over {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(30,102,65,0.18); border-radius: inherit;
-  opacity: 0; transition: opacity 0.3s;
-}
-.card.solved .solved-over { opacity: 1; }
-.check-icon { font-size: 2.2rem; color: var(--success-light); text-shadow: 0 0 14px rgba(61,186,114,0.5); }
-
-/* ── VAULT ── */
-.vault {
-  background: linear-gradient(150deg, #0b0b18 0%, #060610 100%);
-  border: 1px solid rgba(212,175,55,0.3);
-  border-radius: 22px;
-  padding: 44px 28px;
-  text-align: center;
-  box-shadow: inset 0 0 80px rgba(0,0,0,0.6), 0 24px 70px rgba(0,0,0,0.45);
-  position: relative; margin-bottom: 32px;
-}
-.vault::before {
-  content: '';
-  position: absolute; top: -1px; left: 15%; right: 15%; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-.vault-ttl {
-  font-family: 'Frank Ruhl Libre', serif;
-  font-size: 1.6rem; font-weight: 700;
-  color: var(--gold); letter-spacing: 3px; margin-bottom: 6px;
-}
-.vault-sub { color: var(--muted); font-size: 0.82rem; letter-spacing: 2px; margin-bottom: 28px; }
-
-.progress { display: flex; gap: 7px; justify-content: center; margin-bottom: 28px; }
-.pdot {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.25);
+.btn-epic::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent);
   transition: all 0.5s;
 }
-.pdot.on { background: var(--gold); box-shadow: 0 0 8px var(--gold); border-color: var(--gold); }
+.btn-epic:hover { background: rgba(212,175,55,0.1); box-shadow: 0 0 20px rgba(212,175,55,0.3); }
+.btn-epic:hover::before { left: 100%; transition: all 0.8s; }
 
-.digits { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; direction: ltr; margin-bottom: 32px; }
-.digit-in {
-  width: 46px; height: 60px; font-size: 1.9rem; text-align: center;
-  border: 1px solid rgba(212,175,55,0.22); border-radius: 10px;
-  background: #030306; color: #3dff85;
-  font-family: 'Courier New', monospace; font-weight: 700;
-  transition: all 0.25s;
-  box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
-}
-.digit-in:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 0 18px rgba(212,175,55,0.18), inset 0 0 12px rgba(0,0,0,0.6); }
-.digit-in.filled { border-color: rgba(61,255,133,0.35); box-shadow: 0 0 10px rgba(61,255,133,0.12), inset 0 0 12px rgba(0,0,0,0.6); }
+@keyframes slowScale { from { transform: scale(1); } to { transform: scale(1.05); } }
 
-.crack-btn {
-  background: linear-gradient(135deg, #7a5a10 0%, var(--gold) 50%, #7a5a10 100%);
-  color: #07070f; border: none;
-  padding: 15px 46px; font-size: 1.15rem; font-weight: 700;
-  font-family: 'Frank Ruhl Libre', serif;
-  border-radius: 12px; cursor: pointer; letter-spacing: 2px;
-  transition: all 0.28s;
-  box-shadow: 0 4px 22px rgba(212,175,55,0.28);
-}
-.crack-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(212,175,55,0.45); }
-.vault-fb { height: 26px; margin-top: 18px; font-weight: 700; font-size: 0.98rem; color: var(--crimson-bright); letter-spacing: 1px; }
-
-.reset-btn {
-  display: block; margin: 0 auto;
-  background: transparent; color: var(--muted);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 9px 22px; font-size: 0.88rem; border-radius: 8px;
-  cursor: pointer; font-family: 'Heebo', sans-serif; transition: all 0.3s;
-}
-.reset-btn:hover { border-color: var(--crimson-bright); color: var(--crimson-bright); }
-
-/* ── MODAL ── */
-.overlay {
-  position: fixed; inset: 0;
-  background: rgba(4,4,10,0.92);
-  display: none; justify-content: center; align-items: center;
-  z-index: 1000; backdrop-filter: blur(10px);
-}
-.overlay.on { display: flex; }
-.modal {
-  background: var(--bg-modal);
-  width: 92%; max-width: 680px; max-height: 90vh;
-  overflow-y: auto; border-radius: 22px;
-  border: 1px solid rgba(212,175,55,0.28);
-  box-shadow: 0 0 0 1px rgba(212,175,55,0.08), 0 50px 100px rgba(0,0,0,0.7);
-  position: relative;
-  animation: minIn 0.38s cubic-bezier(0.175,0.885,0.32,1.275);
-}
-@keyframes minIn { from { transform: scale(0.82) translateY(24px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-.mhdr {
-  padding: 28px 30px 20px; border-bottom: 1px solid rgba(212,175,55,0.12); position: relative;
-}
-.m-close {
-  position: absolute; top: 18px; left: 18px;
-  background: none; border: 1px solid rgba(212,175,55,0.18);
-  color: var(--muted); width: 34px; height: 34px; border-radius: 50%;
-  font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  padding: 0; transition: all 0.2s; line-height: 1;
-}
-.m-close:hover { border-color: var(--gold); color: var(--gold); }
-.m-plague-icon { font-size: 2.4rem; display: block; margin-bottom: 6px; }
-.m-title { font-family: 'Frank Ruhl Libre', serif; font-size: 1.65rem; font-weight: 700; color: var(--gold); margin: 0; }
-
-.mbody { padding: 26px 30px 32px; }
-
-.ptext {
-  font-size: 1.02rem; line-height: 1.95; margin-bottom: 22px;
-  padding: 16px 18px 16px 14px;
-  background: rgba(255,255,255,0.025);
-  border-right: 3px solid var(--gold-dark);
-  border-radius: 0 10px 10px 0;
-}
-.ptext strong { color: var(--gold-light); }
-.ptext em { color: var(--muted); font-style: normal; font-size: 0.9rem; }
-
-.clues {
-  background: rgba(212,175,55,0.04);
-  border: 1px solid rgba(212,175,55,0.13);
-  border-radius: 11px; padding: 15px 18px;
-  margin: 14px 0; font-size: 0.98rem; line-height: 2.1;
+/* ================== MAP VIEW ================== */
+#map-view {
+  position: relative; z-index: 10; min-height: 100vh;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" opacity="0.03"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.5"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>'), linear-gradient(180deg, #111 0%, #000 100%);
+  padding: 80px 20px 100px;
+  display: none; opacity: 0; transition: opacity 1.5s ease;
 }
 
-.ans-row {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 22px;
-}
-.ans-lbl { font-weight: 700; color: var(--gold); font-size: 0.95rem; white-space: nowrap; }
-.ans-in {
-  width: 76px; height: 50px; font-size: 1.75rem; text-align: center;
-  background: #060610; border: 1px solid rgba(212,175,55,0.28); border-radius: 10px;
-  color: var(--text); font-family: 'Courier New', monospace; font-weight: 700;
-  transition: all 0.25s;
-}
-.ans-in:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 0 16px rgba(212,175,55,0.14); }
-.sub-btn {
-  background: linear-gradient(135deg, var(--crimson) 0%, #b03020 100%);
-  color: #fff; border: none; padding: 13px 28px;
-  font-size: 0.95rem; font-weight: 700; font-family: 'Heebo', sans-serif;
-  border-radius: 10px; cursor: pointer; letter-spacing: 1px; transition: all 0.25s;
-}
-.sub-btn:hover { background: linear-gradient(135deg, #b03020 0%, #d44030 100%); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(176,48,32,0.38); }
-.sub-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+.map-header { text-align: center; margin-bottom: 80px; }
+.map-title { font-family: var(--font-epic); font-size: 3rem; color: var(--c-sand); margin-bottom: 5px; }
+.map-hiero { font-size: 1.5rem; letter-spacing: 15px; color: var(--c-gold-dim); opacity: 0.5; }
 
-.mfb { margin-top: 14px; font-size: 0.95rem; font-weight: 700; min-height: 20px; color: var(--crimson-bright); }
+.timeline { max-width: 600px; margin: 0 auto; position: relative; }
+.timeline-line { position: absolute; right: 39px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(180deg, var(--c-gold-dim), transparent); z-index: 0; opacity: 0.3; }
 
-.reveal {
-  display: none; margin-top: 22px; padding: 22px;
-  background: linear-gradient(135deg, rgba(30,102,65,0.18) 0%, rgba(30,102,65,0.06) 100%);
-  border: 1px solid rgba(61,186,114,0.4); border-radius: 14px; text-align: center;
-  animation: popIn 0.48s cubic-bezier(0.175,0.885,0.32,1.275);
-}
-@keyframes popIn { from { transform: scale(0.68); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.rev-msg { font-size: 0.92rem; color: var(--success-light); margin-bottom: 6px; }
-.rev-dig {
-  font-family: 'Frank Ruhl Libre', serif; font-size: 3.8rem; font-weight: 900;
-  color: var(--success-light); text-shadow: 0 0 22px rgba(61,186,114,0.5); display: block;
-}
-.rev-note { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+.node { display: flex; align-items: center; gap: 30px; margin-bottom: 50px; position: relative; z-index: 1; transition: all 0.4s ease; cursor: pointer; }
+.node.locked { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
+.node.avail { transform: translateX(10px); }
+.node.avail:hover { transform: translateX(20px); }
 
-.hint-btn {
-  background: none; border: 1px solid rgba(212,175,55,0.16);
-  color: var(--gold-dark); padding: 7px 15px; border-radius: 8px;
-  font-size: 0.82rem; cursor: pointer; margin-top: 14px;
-  font-family: 'Heebo', sans-serif; transition: all 0.25s; display: inline-block;
-}
-.hint-btn:hover { border-color: var(--gold); color: var(--gold); }
-.hint-box {
-  display: none; margin-top: 10px; padding: 11px 16px;
-  background: rgba(212,175,55,0.05); border-radius: 8px;
-  font-size: 0.88rem; color: var(--muted); font-style: italic; line-height: 1.7;
-}
+.n-icon { width: 80px; height: 80px; border-radius: 5px; transform: rotate(45deg); background: var(--c-surface); border: 1px solid var(--c-sand-dark); display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.5s; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex-shrink: 0; }
+.n-icon-inner { transform: rotate(-45deg); font-size: 2rem; color: var(--c-sand); }
 
-/* ── VICTORY ── */
-#victory { display: none; text-align: center; padding: 80px 20px; animation: fadeUp 0.9s ease; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; } }
-.v-icon { font-size: 7rem; display: block; margin: 0 auto 28px; animation: boing 2s infinite; }
-@keyframes boing {
-  0%,100% { transform: translateY(0); }
-  40% { transform: translateY(-34px); }
-  60% { transform: translateY(-16px); }
+.node.avail .n-icon { border-color: var(--c-gold); box-shadow: 0 0 20px rgba(212,175,55,0.2); }
+.node.done .n-icon { border-color: #4a5d23; background: #0b1205; }
+.node.done .n-icon-inner { color: #8fbc8f; }
+
+.n-content { flex: 1; text-align: right; }
+.n-ep { font-family: var(--font-ui); font-size: 0.9rem; color: var(--c-gold-dim); letter-spacing: 2px; }
+.n-title { font-family: var(--font-epic); font-size: 1.8rem; color: var(--c-sand); font-weight: 300; }
+
+/* ================== ROOM VIEW ================== */
+#room-view {
+  position: fixed; inset: 0; z-index: 20;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 20px; opacity: 0; pointer-events: none;
+  background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.9) 80%), var(--theme-bg);
+  transition: opacity 1s ease; overflow-y: auto;
 }
-.v-title { font-family: 'Frank Ruhl Libre', serif; font-size: 3rem; color: var(--gold); margin-bottom: 14px; text-shadow: 0 0 40px rgba(212,175,55,0.4); }
-.v-text { font-size: 1.15rem; color: var(--muted); max-width: 480px; margin: 0 auto 40px; line-height: 1.9; }
+#room-view.active { opacity: 1; pointer-events: auto; }
+
+.r-close { position: absolute; top: 30px; right: 30px; background: none; border: none; color: var(--c-sand); font-size: 2rem; cursor: pointer; transition: all 0.3s; z-index: 30; opacity: 0.5; }
+.r-close:hover { opacity: 1; transform: scale(1.1); }
+
+.r-container { max-width: 800px; width: 100%; position: relative; z-index: 2; text-align: center; }
+
+.r-num { font-family: var(--font-ui); font-size: 1rem; letter-spacing: 5px; color: var(--theme-main); opacity: 0.7; margin-bottom: 20px; display: block; }
+.r-title { font-family: var(--font-epic); font-size: clamp(2.5rem, 6vw, 4rem); color: var(--c-sand); margin-bottom: 40px; font-weight: 300; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+
+.r-riddle { font-family: var(--font-epic); font-size: clamp(1.4rem, 4vw, 2.2rem); line-height: 1.6; color: #fff; text-shadow: 0 2px 10px #000; margin-bottom: 60px; padding: 0 10px; font-weight: 300; }
+
+.r-input-wrap { position: relative; max-width: 400px; margin: 0 auto 30px; }
+.r-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--c-sand-dark); padding: 15px 20px; font-family: var(--font-ui); font-size: 1.3rem; color: var(--c-sand); text-align: center; outline: none; transition: all 0.4s; }
+.r-input::placeholder { color: rgba(232, 213, 181, 0.2); font-weight: 300; }
+.r-input:focus { border-color: var(--theme-main); border-bottom-width: 2px; }
+.r-input.shake { animation: shakeError 0.5s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--c-red); color: var(--c-red); }
+
+@keyframes shakeError { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
+
+.r-hint-wrap { margin-top: 30px; min-height: 40px; }
+.r-hint-btn { background: none; border: none; color: var(--c-gold-dim); font-family: var(--font-ui); cursor: pointer; font-size: 1rem; transition: color 0.3s; opacity: 0.6; }
+.r-hint-btn:hover { opacity: 1; }
+.r-hint-text { display: none; font-size: 1.1rem; color: var(--c-sand); font-style: italic; animation: fadeIn 0.5s; font-family: var(--font-epic); }
+
+/* ================== REVEAL & VICTORY ================== */
+.overlay-view { position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 20px; text-align: center; animation: fadeIn 1s ease; overflow-y: auto; }
+
+.rev-title { font-family: var(--font-epic); font-size: 3rem; color: var(--theme-main); margin-bottom: 30px; font-weight: 300; }
+.rev-text { font-family: var(--font-ui); font-size: 1.2rem; color: var(--c-text); max-width: 600px; line-height: 1.8; margin-bottom: 50px; font-weight: 300; }
+.rev-text strong { color: var(--c-sand); font-weight: 500; }
+
+.v-title { font-family: var(--font-epic); font-size: clamp(4rem, 12vw, 7rem); color: var(--c-gold); margin-bottom: 20px; line-height: 1; text-shadow: 0 0 40px rgba(212,175,55,0.4); }
+
+.rst { display: block; margin: 50px auto; background: none; border: none; color: var(--c-gold-dim); cursor: pointer; font-family: var(--font-ui); letter-spacing: 1px; opacity: 0.5; transition: 0.3s; }
+.rst:hover { opacity: 1; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ================== MOBILE ================== */
+@media(max-width: 600px) {
+  .timeline-line { right: 29px; }
+  .node { gap: 20px; }
+  .n-icon { width: 60px; height: 60px; }
+  .n-icon-inner { font-size: 1.5rem; }
+  .n-title { font-size: 1.4rem; }
+  .r-close { top: 15px; right: 15px; font-size: 1.5rem; }
+}
 </style>
 </head>
 <body>
 
-<header>
-  <h1 class="h-title">מבצע אפיקומן: עשר המכות</h1>
-  <p class="h-sub">חדר בריחה לוגי — רמת תיכון</p>
-</header>
+<canvas id="fx-canvas"></canvas>
 
-<div class="wrap" id="game">
-  <div class="mission">
-    האפיקומן ננעל בכספת דיגיטלית מאובטחת ב-<strong>10 ספרות</strong>. לכל מכה חידה — ולכל חידה ספרה אחת. <strong>החידות דורשות חשיבה לוגית אמיתית</strong> ולא ניתן לפתור אותן בכוח גס. פתרו בסדר, רשמו כל ספרה, ופצחו את הכספת.
-  </div>
-
-  <div class="grid" id="grid"></div>
-
-  <div class="vault">
-    <div class="vault-ttl">🔐 מערכת נעילה 🔐</div>
-    <div class="vault-sub">10 ספרות · לפי הסדר</div>
-    <div class="progress" id="progress"></div>
-    <div class="digits" id="digits"></div>
-    <button class="crack-btn" onclick="crack()">פצח את הכספת</button>
-    <div class="vault-fb" id="vfb"></div>
-  </div>
-
-  <button class="reset-btn" onclick="reset()">↺ איפוס משחק</button>
+<div id="splash-view">
+  <div class="splash-logo">נסיך מצרים</div>
+  <div class="splash-sub">מסע מתוך האפלה אל האור</div>
+  <button class="btn-epic" onclick="startJourney()">שלח את עמי</button>
 </div>
 
-<div id="victory">
-  <span class="v-icon">🎁</span>
-  <h2 class="v-title">הצפנה פוצחה!</h2>
-  <p class="v-text">מצאתם את האפיקומן! חשיבה לוגית מדויקת הובילה אתכם לניצחון.<br><strong style="color:var(--gold)">חג פסח כשר ושמח! 🌟</strong></p>
-  <button class="crack-btn" onclick="reset()">התחל מחדש</button>
+<div id="map-view">
+  <div class="map-header">
+    <div class="map-hiero">𓀀 𓁐 𓃒 𓇳 𓈖 𓋹</div>
+    <h1 class="map-title">דברי הימים</h1>
+  </div>
+  <div class="timeline">
+    <div class="timeline-line"></div>
+    <div id="nodes-container"></div>
+  </div>
+  <button class="rst" onclick="resetGame()">אפס מסע</button>
 </div>
 
-<!-- MODAL -->
-<div class="overlay" id="overlay">
-  <div class="modal" id="modal">
-    <div class="mhdr">
-      <button class="m-close" onclick="closeM()">×</button>
-      <span class="m-plague-icon" id="m-icon"></span>
-      <h2 class="m-title" id="m-title"></h2>
-    </div>
-    <div class="mbody">
-      <div class="ptext" id="ptext"></div>
-      <div id="interact"></div>
-      <div class="mfb" id="mfb"></div>
-      <div class="reveal" id="reveal">
-        <div class="rev-msg">✓ תשובה נכונה! הספרה שלכם לחידה זו:</div>
-        <span class="rev-dig" id="rev-dig"></span>
-        <div class="rev-note">הכניסו ספרה זו לתא המתאים בכספת</div>
+<div id="room-view">
+  <button class="r-close" onclick="closeRoom()">✕</button>
+  <div class="r-container">
+    <span class="r-num" id="r-num"></span>
+    <h2 class="r-title" id="r-title"></h2>
+    <div class="r-riddle" id="r-riddle"></div>
+    
+    <div id="r-interaction">
+      <div class="r-input-wrap">
+        <input type="text" id="r-input" class="r-input" placeholder="חשפו את התשובה..." autocomplete="off">
+      </div>
+      <button class="btn-epic" style="border-radius:30px; font-size:1rem; padding:10px 30px;" onclick="checkAnswer()">פענח</button>
+      
+      <div class="r-hint-wrap">
+        <button class="r-hint-btn" id="hint-btn" onclick="toggleHint()">קול פנימי...</button>
+        <div class="r-hint-text" id="r-hint"></div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-// ══════════════════════════════════════════════
-//  PUZZLE DATA
-//  CODE: 2 4 3 5 8 5 9 3 7 0  →  "2435859370"
-// ══════════════════════════════════════════════
-/*
-  P1 Blood:   Knights/Knaves  → 2 knights
-  P2 Frogs:   Logic grid      → 4 liters (yellow frog)
-  P3 Lice:    Balance scale   → 3 weighings (27 bags)
-  P4 Animals: Ordering        → position 5 (crocodile)
-  P5 Cattle:  System of eqs   → 8 cattle (farmer A)
-  P6 Boils:   Pain scores     → 5 (patient A)
-  P7 Hail:    Wheat fields    → 9 tons remain
-  P8 Locusts: Modular time    → units digit of 13 = 3
-  P9 Darkness:Pigeonhole      → 7 socks
-  P10 First:  Divisibility    → units digit of 10 = 0
-*/
+<div id="reveal-view" class="overlay-view">
+  <div class="rev-title">הסוד נחשף</div>
+  <div class="rev-text" id="rev-text"></div>
+  <button class="btn-epic" onclick="continueMap()">המשך בדרך</button>
+</div>
 
-const PUZZLES = [
-{
-  id:1, icon:'🩸', label:'מכת דם',
-  title:'מכת דם — פלשת הכוהנים',
-  answer:2,
-  hint:'הניחו שכוהן א׳ הוא אביר — בדקו אם כל ההצהרות עקביות. אחר-כך הניחו שהוא נוכל. אחת ההנחות תוביל לסתירה.',
-  html:`<p>ארבעה כוהנים מצריים נחקרים. כל אחד הוא <strong>אביר</strong> (תמיד אומר אמת) או <strong>נוכל</strong> (תמיד משקר). הצהרותיהם:</p>
-  <div class="clues">
-    כוהן א׳: <strong>״כוהן ב׳ ואני מאותו הסוג.״</strong><br>
-    כוהן ב׳: <strong>״בדיוק שניים מאיתנו הם אבירים.״</strong><br>
-    כוהן ג׳: <strong>״כוהן א׳ הוא נוכל.״</strong><br>
-    כוהן ד׳: <strong>״כוהן ג׳ הוא אביר.״</strong>
+<div id="victory-view" class="overlay-view" style="background: radial-gradient(circle, #001a33, #000);">
+  <div class="v-title">חירות</div>
+  <div class="rev-text" style="font-size:1.4rem;">
+    עברתם את המדבר, שברתם את שלשלאות העבר וקראתם את ים סוף.<br><br>
+    המסע האמיתי של העם מתחיל עכשיו.<br>
+    <strong style="color:var(--c-gold);">חג חירות שמח.</strong>
   </div>
-  <p>פענחו: <strong>כמה אבירים יש בקבוצה?</strong></p>`
-},
-{
-  id:2, icon:'🐸', label:'מכת צפרדע',
-  title:'מכת צפרדע — כדי הנילוס',
-  answer:4,
-  hint:'הירוקה = 5 ליטר (הכי הרבה). האדומה = 2. מה נשאר לשלוש הנותרות? הסגולה ≠ 1, הכחולה < 4.',
-  html:`<p>5 צפרדעות צבעוניות קפצו לכדי חרס. כל כד מכיל כמות מים שונה: <strong>1, 2, 3, 4 או 5 ליטר</strong> — כל כמות פעם אחת בדיוק.</p>
-  <div class="clues">
-    • הצפרדעת <strong>הירוקה</strong> קפצה לכד עם יותר מים מכל האחרות.<br>
-    • הצפרדעת <strong>האדומה</strong> קפצה לכד עם 2 ליטר.<br>
-    • הצפרדעת <strong>הצהובה</strong> קפצה לכד עם פחות מים מהירוקה ויותר מהסגולה.<br>
-    • הצפרדעת <strong>הסגולה</strong> לא קפצה לכד עם 1 ליטר.<br>
-    • הצפרדעת <strong>הכחולה</strong> קפצה לכד עם פחות מ-4 ליטר.
-  </div>
-  <p>לכמה ליטר קפצה <strong>הצפרדעת הצהובה</strong>?</p>`
-},
-{
-  id:3, icon:'🦟', label:'מכת כינים',
-  title:'מכת כינים — שקי האבק',
-  answer:3,
-  hint:'בכל שקילה ניתן לחלק את השקים ל-3 קבוצות שוות ולזהות את הקבוצה הכבדה. 3¹=3, 3²=9, 3³=27. כמה חזקות של 3 צריך?',
-  html:`<p>לפניכם <strong>27 שקי אבק</strong> הנראים זהים. <strong>אחד מהם כבד יותר</strong> מהאחרים (26 השקים האחרים שקולים זה לזה בדיוק).</p>
-  <p>ברשותכם <strong>מאזניים (פלס)</strong> בלבד — ניתן להניח שקים משני הצדדים ולראות מה כבד יותר, שווה, או קל יותר. אין משקולות חיצוניות.</p>
-  <p>מהו <strong>המספר המינימלי של שקילות</strong> שיבטיח לכם לאתר את השק הכבד בכל מקרה?</p>`
-},
-{
-  id:4, icon:'🦁', label:'מכת ערוב',
-  title:'מכת ערוב — שורת הפולשים',
-  answer:5,
-  hint:'הנחש ב-1 או 2, הזאב מיד אחריו. בדקו נחש=1: מה יוצא? בדקו נחש=2: האם זה עקבי עם שאר הרמזים?',
-  html:`<p>5 חיות פרועות (<strong>נחש, זאב, ארי, נמר, תנין</strong>) ישבו בשורה במקומות <strong>1 עד 5</strong> (1=שמאל, 5=ימין).</p>
-  <div class="clues">
-    • הנחש ישב במקום ה-<strong>1</strong> או ה-<strong>2</strong>.<br>
-    • הזאב ישב <strong>מיד מימין לנחש</strong> (מקום גבוה ב-1).<br>
-    • הארי <strong>לא ישב בקצה</strong> — לא מקום 1 ולא מקום 5.<br>
-    • הנמר ישב <strong>בין</strong> הארי לתנין (במקום בין מקומיהם).<br>
-    • התנין ישב <strong>מימין לארי</strong> (מקום גבוה יותר).
-  </div>
-  <p>מה <strong>מיקום ישיבתו של התנין</strong>?</p>`
-},
-{
-  id:5, icon:'🐄', label:'מכת דבר',
-  title:'מכת דבר — המנין המוסתר',
-  answer:8,
-  hint:'חברו את שלוש המשוואות: תקבלו 2(א+ב+ג). חשבו את הסכום הכולל. ואז: א = סכום כולל פחות (ב+ג).',
-  html:`<p>שלושה חקלאים מצריים (א׳, ב׳, ג׳) גידלו עדרי בקר. משה ספר ומצא:</p>
-  <div class="clues">
-    • א׳ <strong>ו-</strong>ב׳ יחד גידלו <strong>20</strong> ראשי בקר.<br>
-    • ב׳ <strong>ו-</strong>ג׳ יחד גידלו <strong>18</strong> ראשי בקר.<br>
-    • א׳ <strong>ו-</strong>ג׳ יחד גידלו <strong>14</strong> ראשי בקר.
-  </div>
-  <p>לאחר מכת הדבר מת <strong>כל הבקר של חקלאי ב׳</strong>. כמה ראשי בקר היו <strong>לחקלאי א׳</strong> לפני המכה?</p>`
-},
-{
-  id:6, icon:'🤒', label:'מכת שחין',
-  title:'מכת שחין — מד הכאב',
-  answer:5,
-  hint:'ה=3, ג=2 נתונים ישירות. ב = ג+2. עכשיו נשארו שני ציונים עבור א ו-ד. איזה מהם מקיים א = ד+4?',
-  html:`<p>5 מטופלים (א׳–ה׳) קיבלו ציוני כאב שונים: <strong>1, 2, 3, 4, 5</strong> — כל ציון פעם אחת בדיוק.</p>
-  <div class="clues">
-    • מטופל <strong>ה׳</strong> קיבל ציון <strong>3</strong>.<br>
-    • ציון מטופל <strong>ב׳</strong> גבוה מציון <strong>ג׳</strong> בדיוק ב-<strong>2</strong> נקודות.<br>
-    • ציון מטופל <strong>א׳</strong> גבוה מציון <strong>ד׳</strong> בדיוק ב-<strong>4</strong> נקודות.<br>
-    • מטופל <strong>ג׳</strong> קיבל ציון <strong>2</strong>.
-  </div>
-  <p>מה <strong>ציון הכאב של מטופל א׳</strong>?</p>`
-},
-{
-  id:7, icon:'🧊', label:'מכת ברד',
-  title:'מכת ברד — שדות החיטה',
-  answer:9,
-  hint:'ג=4, ב=8 נתונים. מהמשוואה הכוללת: מצאו ד, ואז א=3ד. הברד השמיד מחצית.',
-  html:`<p>ארבעה מגדלים מצריים (א׳, ב׳, ג׳, ד׳) גידלו חיטה. נתונים:</p>
-  <div class="clues">
-    • ארבעתם גידלו יחד <strong>36 טון</strong>.<br>
-    • מגדל <strong>ג׳</strong> גידל <strong>4 טון</strong>.<br>
-    • מגדל <strong>ב׳</strong> גידל <strong>4 טון יותר</strong> ממגדל ג׳.<br>
-    • מגדל <strong>א׳</strong> גידל <strong>פי 3</strong> ממגדל ד׳.
-  </div>
-  <p>הברד השמיד <strong>בדיוק מחצית</strong> מהחיטה של כל מגדל.<br>כמה טון נשארו <strong>למגדל א׳</strong> לאחר הברד?</p>`
-},
-{
-  id:8, icon:'🦗', label:'מכת ארבה',
-  title:'מכת ארבה — נחיל הצבא',
-  answer:3,
-  hint:'השדה הראשון נאכל בשעה 4. כל שדה נוסף אחרי 8 שעות נוספות: 4, 12, 20, ... 4+8k ≤ 100. מה k המקסימלי?',
-  html:`<p>נחיל ארבה אוכל <strong>שדה חיטה שלמה כל 8 שעות</strong>. הנחיל הגיע לשדה הראשון בשעה <strong>4:00</strong> של יום ה-1.</p>
-  <p>כמה שדות אכל הנחיל ב<strong>-100 השעות הראשונות</strong> (משעה 0:00 עד שעה 100:00)?</p>
-  <p><em>⬥ הכניסו את ספרת האחדות של התשובה כקוד ⬥</em></p>`
-},
-{
-  id:9, icon:'🌑', label:'מכת חושך',
-  title:'מכת חושך — גרבי הלילה',
-  answer:7,
-  hint:'חשבו על המקרה הגרוע ביותר: שלפתם 2 כחולות, 2 אדומות, 2 ירוקות ועדיין אין שלישייה. מה יקרה בשליפה הבאה?',
-  html:`<p>בחדר <strong>חשוך לחלוטין</strong> יש מגירה עם:</p>
-  <div class="clues">
-    • 12 גרביים <strong>כחולות</strong><br>
-    • 12 גרביים <strong>אדומות</strong><br>
-    • 12 גרביים <strong>ירוקות</strong><br>
-    <em>(כולן מעורבות — אין אפשרות לזהות צבע)</em>
-  </div>
-  <p>מהו <strong>המספר המינימלי של גרביים</strong> שתצטרכו לשלוף כדי להיות <strong>בטוחים ב-100%</strong> שיש בידיכם לפחות <strong>3 גרביים מאותו הצבע</strong>?</p>`
-},
-{
-  id:10, icon:'🚪', label:'מכת בכורות',
-  title:'מכת בכורות — רחוב הדמים',
-  answer:0,
-  hint:'ספרו: כמה מספרים 1–30 מתחלקים ב-2? (15 מספרים). כמה מהם גם מתחלקים ב-3? (5 מספרים — אלה שמתחלקים ב-6). הפחיתו.',
-  html:`<p>ברחוב מצרי יש <strong>30 בתים</strong> ממוספרים 1 עד 30.</p>
-  <p>מלאך המוות עוקף את הבתים שמספרם מתחלק <strong>ב-2 אבל לא ב-3</strong> — עליהם מסומן דם על המשקוף.</p>
-  <p>כמה בתים <strong>ניצלו</strong> ממכת הבכורות?</p>
-  <p><em>⬥ הכניסו את ספרת האחדות של התשובה כקוד ⬥</em></p>`
-}
+  <button class="btn-epic" onclick="resetGame()">שובו למצרים</button>
+</div>
+
+<script>
+// ================= DATA (THE PRINCE OF EGYPT EDITION) =================
+const RIDDLES = [
+  {
+    tt: 'יסודות האימפריה', ic: '𓊃', 
+    st: 'אני שותה את זיעת העבדים ואת מי הנהר. בשמש אני מתקשה, וכך גם לבבות מעבידיי. בניתי אימפריה שנוגעת בשמיים, אך אני עשויה רק מעפר. מה אני?',
+    an: ['לבנה', 'לבנים', 'טיט', 'הלבנה', 'הלבנים', 'חומר', 'מלט'], hi: 'ממה נבנו פיתום ורעמסס?',
+    ex: 'ה<strong>לבנים והטיט</strong>. האימפריה המצרית האדירה נבנתה מאבק, מים ודם של עבדים. סמל לשעבוד הפיזי והנפשי, ולשבריריות של כוח המבוסס על סבל.',
+    theme: '#a67c00', bg: '#0b0c10', fx: 'sand'
+  },
+  {
+    tt: 'סירת התקווה', ic: '𓊝', 
+    st: 'הייתי סירה זעירה של תקווה בתוך ים של גזרות. אם אמיצה חתמה אותי בזפת וחימר, ונשאתי את עתיד העם אל בין זרועותיו של האויב. מה אני?',
+    an: ['תיבה', 'התיבה', 'תיבת גומא', 'תיבת משה', 'סל'], hi: 'כיצד ניצל התינוק משה מהיאור?',
+    ex: '<strong>תיבת הגומא</strong>. יציאת מצרים מתחילה בגבורתן של נשים – יוכבד שהחביאה, מרים ששמרה, ובת פרעה שמשתה אותו. התיבה היא הרחם השני שממנו נולד מנהיג.',
+    theme: '#4da6ff', bg: '#001122', fx: 'water'
+  },
+  {
+    tt: 'הפרדוקס הבוער', ic: '𓄡', 
+    st: 'אני שובר את חוקי הטבע: רוקד באור בוהק, ניזון מהאוויר, אך העץ שעליו אני נח נותר שלם, והאדמה סביבי דורשת יחפנות. מה אני?',
+    an: ['סנה', 'הסנה', 'סנה בוער', 'הסנה הבוער', 'אש'], hi: 'ההתגלות הראשונה למשה במדבר מדין.',
+    ex: 'ה<strong>סנה הבוער</strong>. מסמל את עם ישראל: מצוי בתוך אש הסבל והשעבוד, אך "איננו אוכל" - אינו מושמד. כאן מתחיל החיבור המחודש בין האל למשה.',
+    theme: '#ff6600', bg: '#1a0500', fx: 'embers'
+  },
+  {
+    tt: 'אל החיים הגוסס', ic: '𓈗', 
+    st: 'סגדו לי כאל החיים, מקור השפע של הממלכה. אך כשהאמת נחשפה, הקאתי את סודותיי והראיתי להם את צבע הפשעים שבלעתי בעבר. מה אני?',
+    an: ['יאור', 'היאור', 'נילוס', 'הנילוס', 'נהר', 'דם', 'מכת דם'], hi: 'המכה הראשונה – לאן הושלכו ילדי העברים?',
+    ex: 'ה<strong>יאור (שהפך לדם)</strong>. המצרים סגדו לנילוס כאל, אך המכה חשפה את האמת: הנהר רווי בדם התינוקות שהושלכו אליו. העונש תואם בדיוק לחטא.',
+    theme: '#8b0000', bg: '#140000', fx: 'blood'
+  },
+  {
+    tt: 'ברית האויבים', ic: '𓆪', 
+    st: 'אנו שני כוחות מנוגדים שירדו יחד מן השמיים בשלום נדיר. קפאנו ובערנו בעת ובעונה אחת, וניפצנו את גאוות הארץ. מי אנחנו?',
+    an: ['ברד', 'הברד', 'מכת ברד', 'אש וברד', 'ברד ואש'], hi: 'המכה השביעית, שבה אש ומים חיו בדו-קיום להרס התבואה.',
+    ex: 'מכת <strong>ברד (ואש מתלקחת בתוכו)</strong>. הנס היה שכוחות מנוגדים בטבע עשו שלום ביניהם כדי להוציא לפועל את רצון האל ולשבור את עקשנות פרעה.',
+    theme: '#a3c2c2', bg: '#051111', fx: 'ash'
+  },
+  {
+    tt: 'הכלא השקוף', ic: '𓇰', 
+    st: 'אינני חפץ, אך במצרים אפשר היה למשש אותי. כלאתי כל אדם במקומו ועיוורתי את האימפריה, אך באוהלי העבדים לא הייתי קיימת. מה אני?',
+    an: ['חושך', 'החושך', 'מכת חושך', 'אפלה'], hi: 'המכה התשיעית: "ולא קמו איש מתחתיו..."',
+    ex: 'מכת <strong>חושך</strong>. אפלה סמיכה שהיא מעבר להעדר אור – חושך נפשי, בידוד מוחלט שבו המצרי לא יכול לראות את אחיו, בעוד לבני ישראל "היה אור במושבותם".',
+    theme: '#404040', bg: '#000000', fx: 'none'
+  },
+  {
+    tt: 'חותם החיים', ic: '𓉐', 
+    st: 'אינני מנעול ואינני בריח, אך עצרתי את המשחית בדרכו. נמשחתי בחיפזון בחשכת הלילה, והפכתי את עץ הבית לשער של גאולה. מה אני?',
+    an: ['משקוף', 'המשקוף', 'מזוזות', 'המזוזות', 'דם', 'מזוזה'], hi: 'מה סומן בדם השה כדי שהמוות יפסח על בתי העברים?',
+    ex: 'ה<strong>משקוף (והמזוזות)</strong>. הדם על הפתח לא נועד לאל שרואה הכל, אלא לעם עצמו – צעד אקטיבי של אומץ לשחוט את האליל המצרי (השה) ולהכריז על פרישה מהשעבוד.',
+    theme: '#cc0000', bg: '#1a0505', fx: 'embers'
+  },
+  {
+    tt: 'לחם הממהרים', ic: '𓏐', 
+    st: 'נולדתי מתוך המהירות, ללא זמן לתפוח ולגדול בנחת. בעבר הייתי סמל לעוני, אך הלילה אני טעם החירות של עם בורח. מה אני?',
+    an: ['מצה', 'המצה', 'מצות', 'לחם עוני'], hi: 'המאכל שאנו אוכלים זכר לכך שבצקם לא הספיק להחמיץ.',
+    ex: 'ה<strong>מצה</strong>. לחם עוני שהפך ללחם גאולה. היא מסמלת את החיפזון של הרגע שבו ההזדמנות לחירות מגיעה – אסור להתמהמה, יש לקום ולצאת מיד.',
+    theme: '#e8d5b5', bg: '#141108', fx: 'sand'
+  },
+  {
+    tt: 'השומרים המתחלפים', ic: '𓆽', 
+    st: 'אנו שני שומרים. אחד מעניק צל מנחם כשהשמש מכה, והשני קורע את החשכה בלהבה. חצצנו יחד בין צבא הרודפים לעם הנרדף. מי אנחנו?',
+    an: ['ענן', 'אש', 'ענן ואש', 'אש וענן', 'עמוד ענן', 'עמוד אש', 'העמודים', 'עמודי אש וענן'], hi: 'מה הוביל את מחנה ישראל ביום ובלילה?',
+    ex: '<strong>עמודי הענן והאש</strong>. הם לא רק הורו את הדרך, אלא סיפקו הגנה אקטיבית על שפת הים, מפרידים בין עברם של בני ישראל (מצרים) לעתידם (המדבר).',
+    theme: '#d9d9d9', bg: '#0c121a', fx: 'ash'
+  },
+  {
+    tt: 'החומה הרועשת', ic: '𓈖', 
+    st: 'הייתי חומה שקופה ורועשת שניצבה משני עברי הדרך. נקרעתי לשניים בכוח הרוח והמטה, והפכתי מקבר פוטנציאלי לשער אל החופש. מה אני?',
+    an: ['ים', 'הים', 'ים סוף', 'מים', 'המים', 'קריעת ים סוף'], hi: 'הנס הגדול שחתם את היציאה ואפשר את המעבר למדבר.',
+    ex: '<strong>ים סוף</strong>. שיא המסע. המים, שבעבר היו סכנה (היאור), הפכו כעת למפלט ולכלי השמדה של צבא האויב. המעבר בתוך הים הוא כמו לידה מחדש של עם חופשי.',
+    theme: '#0066cc', bg: '#000b1a', fx: 'water'
+  }
 ];
 
-const CODE = "2435859370";
-let state = JSON.parse(localStorage.getItem('pesach25')) || { solved: Array(10).fill(false) };
-let cur = 0;
+let state = JSON.parse(localStorage.getItem('exodus_cinematic')) || { solved: Array(10).fill(false) };
+let currentRoom = -1;
 
-// ── BUILD ──
-function build() {
-  // Grid
-  document.getElementById('grid').innerHTML = PUZZLES.map(p => `
-    <div class="card" id="card-${p.id}" onclick="openM(${p.id})">
-      <span class="card-num">#${p.id}</span>
-      <span class="card-icon">${p.icon}</span>
-      <div class="card-label">${p.label}</div>
-      <div class="solved-over"><span class="check-icon">✓</span></div>
-    </div>`).join('');
+// ================= CANVAS FX ENGINE =================
+const canvas = document.getElementById('fx-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animFrame;
 
-  // Progress dots
-  document.getElementById('progress').innerHTML =
-    Array.from({length:10},(_,i)=>`<div class="pdot" id="d${i+1}"></div>`).join('');
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize);
+resize();
 
-  // Digit inputs
-  document.getElementById('digits').innerHTML =
-    Array.from({length:10},(_,i)=>`
-      <input type="tel" maxlength="1" class="digit-in" id="v${i+1}"
-        oninput="dInput(this,${i+1})" placeholder="•">`).join('');
-
-  sync();
+class Particle {
+  constructor(type) { this.type = type; this.reset(); this.y = Math.random() * canvas.height; }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = this.type==='embers' ? canvas.height+10 : this.type==='water' ? -10 : Math.random() * canvas.height;
+    this.life = Math.random() * 100 + 50;
+    
+    if(this.type === 'sand') {
+      this.vx = (Math.random() - 0.5) * 2; this.vy = (Math.random() - 0.5) * 1;
+      this.size = Math.random() * 2; this.c = `rgba(232, 213, 181, ${Math.random()*0.4})`;
+    } else if(this.type === 'embers') {
+      this.vx = (Math.random() - 0.5) * 3; this.vy = -(Math.random() * 4 + 1);
+      this.size = Math.random() * 3 + 1; this.c = `rgba(255, ${Math.random()*100+50}, 0, ${Math.random()*0.8})`;
+    } else if(this.type === 'blood') {
+      this.vx = 0; this.vy = Math.random() * 2 + 1;
+      this.size = Math.random() * 4 + 2; this.c = `rgba(139, 0, 0, ${Math.random()*0.5})`;
+    } else if(this.type === 'water') {
+      this.vx = 0; this.vy = Math.random() * 5 + 3;
+      this.size = Math.random() * 2 + 1; this.c = `rgba(100, 150, 255, ${Math.random()*0.6})`;
+    } else if(this.type === 'ash') {
+      this.vx = (Math.random() - 0.5) * 1; this.vy = Math.random() * 2 + 0.5;
+      this.size = Math.random() * 2 + 1; this.c = `rgba(200, 200, 200, ${Math.random()*0.5})`;
+    }
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy; this.life--;
+    if (this.x < 0 || this.x > canvas.width || this.y < -20 || this.y > canvas.height+20 || this.life <= 0) {
+      this.reset();
+    }
+  }
+  draw() {
+    ctx.beginPath(); ctx.fillStyle = this.c; ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+  }
 }
 
-function dInput(el, n) {
-  el.value = el.value.replace(/[^0-9]/,'');
-  if (el.value) { el.classList.add('filled'); if(n<10) document.getElementById(`v${n+1}`).focus(); }
-  else el.classList.remove('filled');
+function startFX(type) {
+  cancelAnimationFrame(animFrame); particles = []; ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(type === 'none') { canvas.style.opacity = 0; return; }
+  canvas.style.opacity = 1;
+  let count = window.innerWidth < 600 ? 40 : 100; // Optimize for mobile
+  for(let i=0; i<count; i++) particles.push(new Particle(type));
+  function loop() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    animFrame = requestAnimationFrame(loop);
+  }
+  loop();
 }
 
-function sync() {
-  state.solved.forEach((s,i) => {
-    document.getElementById(`card-${i+1}`)?.classList.toggle('solved', s);
-    document.getElementById(`d${i+1}`)?.classList.toggle('on', s);
+// ================= GAME LOGIC =================
+
+function init() {
+  if (state.solved.some(x=>x)) {
+    // Already started playing, skip splash
+    document.getElementById('splash-view').style.display = 'none';
+    showMap();
+  }
+}
+
+function startJourney() {
+  const splash = document.getElementById('splash-view');
+  splash.style.opacity = 0;
+  setTimeout(() => {
+    splash.style.display = 'none';
+    showMap();
+  }, 1000);
+}
+
+function showMap() {
+  const map = document.getElementById('map-view');
+  map.style.display = 'block';
+  setTimeout(() => map.style.opacity = 1, 50);
+  renderNodes();
+}
+
+function renderNodes() {
+  const cont = document.getElementById('nodes-container');
+  cont.innerHTML = '';
+  let win = state.solved.filter(Boolean).length === 10;
+  
+  RIDDLES.forEach((r, i) => {
+    const done = state.solved[i];
+    const avail = !done && (i === 0 || state.solved[i-1]);
+    const locked = !done && !avail;
+    
+    const div = document.createElement('div');
+    div.className = `node ${done ? 'done' : avail ? 'avail' : 'locked'}`;
+    if(avail || done) div.onclick = () => openRoom(i);
+    
+    div.innerHTML = `
+      <div class="n-content">
+        <span class="n-ep">חלק ${String.fromCharCode(1488 + i)}׳</span>
+        <div class="n-title">${locked ? 'נסתר' : r.tt}</div>
+      </div>
+      <div class="n-icon"><div class="n-icon-inner">${done ? '✓' : locked ? '·' : r.ic}</div></div>
+    `;
+    cont.appendChild(div);
   });
+  
+  if(win) {
+    setTimeout(() => {
+      document.getElementById('map-view').style.display = 'none';
+      const v = document.getElementById('victory-view');
+      v.style.display = 'flex';
+    }, 1000);
+  }
 }
 
-function save() { localStorage.setItem('pesach25', JSON.stringify(state)); sync(); }
-
-// ── MODAL ──
-function openM(n) {
-  if (state.solved[n-1]) return;
-  cur = n;
-  const p = PUZZLES[n-1];
-  document.getElementById('m-icon').textContent = p.icon;
-  document.getElementById('m-title').textContent = p.title;
-  document.getElementById('ptext').innerHTML = p.html;
-  document.getElementById('interact').innerHTML = `
-    <div class="ans-row">
-      <span class="ans-lbl">תשובה:</span>
-      <input type="number" class="ans-in" id="ain" placeholder="?" onkeydown="if(event.key==='Enter')check()">
-      <button class="sub-btn" id="sbtn" onclick="check()">בדוק ✓</button>
-    </div>
-    <button class="hint-btn" onclick="toggleHint()">💡 רמז</button>
-    <div class="hint-box" id="hbox">${p.hint}</div>`;
-  document.getElementById('mfb').textContent = '';
-  document.getElementById('reveal').style.display = 'none';
-  document.getElementById('overlay').classList.add('on');
-  setTimeout(()=>{ const a=document.getElementById('ain'); if(a) a.focus(); },380);
+function openRoom(i) {
+  currentRoom = i;
+  const r = RIDDLES[i];
+  
+  // Theme
+  document.documentElement.style.setProperty('--theme-main', r.theme);
+  document.documentElement.style.setProperty('--theme-bg', r.bg);
+  startFX(r.fx);
+  
+  // Content
+  document.getElementById('r-num').textContent = `— פאסאז' ${i+1} —`;
+  document.getElementById('r-title').textContent = r.tt;
+  document.getElementById('r-riddle').innerHTML = r.st;
+  
+  const inp = document.getElementById('r-input');
+  inp.value = ''; inp.classList.remove('shake');
+  
+  document.getElementById('r-hint-wrap').style.display = state.solved[i] ? 'none' : 'block';
+  document.getElementById('r-hint').style.display = 'none';
+  document.getElementById('r-hint').textContent = r.hi;
+  
+  // View change
+  document.getElementById('map-view').style.opacity = 0;
+  setTimeout(() => {
+    document.getElementById('map-view').style.display = 'none';
+    const rv = document.getElementById('room-view');
+    rv.classList.add('active');
+    rv.scrollTop = 0;
+    
+    document.getElementById('r-interaction').style.display = state.solved[i] ? 'none' : 'block';
+  }, 500);
 }
 
-function closeM() { document.getElementById('overlay').classList.remove('on'); }
+function closeRoom() {
+  document.getElementById('room-view').classList.remove('active');
+  startFX('none');
+  setTimeout(() => {
+    const map = document.getElementById('map-view');
+    map.style.display = 'block';
+    setTimeout(() => map.style.opacity = 1, 50);
+  }, 500);
+}
 
 function toggleHint() {
-  const h = document.getElementById('hbox');
-  h.style.display = h.style.display==='block' ? 'none' : 'block';
-}
-
-function check() {
-  const el = document.getElementById('ain');
-  const v = parseInt(el.value);
-  const p = PUZZLES[cur-1];
-  if (isNaN(v)) { document.getElementById('mfb').textContent = 'נא להכניס מספר.'; return; }
-  if (v === p.answer) {
-    state.solved[cur-1] = true; save();
-    document.getElementById('mfb').textContent = '';
-    document.getElementById('rev-dig').textContent = p.answer;
-    document.getElementById('reveal').style.display = 'block';
-    el.disabled = true;
-    const sb = document.getElementById('sbtn'); if(sb) sb.disabled = true;
-    // Auto-fill vault
-    const vi = document.getElementById(`v${cur}`);
-    if (vi) { vi.value = p.answer; vi.classList.add('filled'); }
+  const h = document.getElementById('r-hint');
+  const btn = document.getElementById('hint-btn');
+  if(h.style.display === 'block') {
+    h.style.display = 'none'; btn.style.display = 'inline-block';
   } else {
-    const fb = document.getElementById('mfb');
-    fb.textContent = '✗ תשובה שגויה — בדקו שוב את הלוגיקה.';
-    el.style.borderColor = 'var(--crimson-bright)';
-    setTimeout(()=>{ el.style.borderColor=''; fb.textContent=''; }, 2200);
+    h.style.display = 'block'; btn.style.display = 'none';
   }
 }
 
-// ── VAULT ──
-function crack() {
-  let code = '', full = true;
-  for(let i=1;i<=10;i++){
-    const v = document.getElementById(`v${i}`).value;
-    if(!v) full=false;
-    code += v;
-  }
-  const fb = document.getElementById('vfb');
-  if (!full) { fb.textContent='⬥ מלאו את כל 10 התאים ⬥'; return; }
-  if (code === CODE) {
-    document.getElementById('game').style.display='none';
-    document.getElementById('victory').style.display='block';
-    closeM();
+function normalize(s) {
+  // מסיר רווחים מיותרים, סימני פיסוק, והופך למחרוזת נקייה
+  return s.trim().replace(/[.,!?"'״]/g, '').replace(/\s+/g, ' ');
+}
+
+function checkAnswer() {
+  const inp = document.getElementById('r-input');
+  const val = normalize(inp.value);
+  if(!val) { shake(inp); return; }
+  
+  const r = RIDDLES[currentRoom];
+  const isCorrect = r.an.some(a => normalize(a) === val);
+  
+  if(isCorrect) {
+    state.solved[currentRoom] = true;
+    localStorage.setItem('exodus_cinematic', JSON.stringify(state));
+    inp.blur();
+    
+    document.getElementById('room-view').classList.remove('active');
+    setTimeout(() => {
+      document.getElementById('rev-text').innerHTML = r.ex;
+      const rev = document.getElementById('reveal-view');
+      rev.style.display = 'flex'; rev.scrollTop = 0;
+    }, 500);
+    
   } else {
-    fb.textContent='✗ קוד שגוי — בדקו את הפתרונות';
+    shake(inp);
   }
 }
 
-function reset() {
-  if(confirm('לאפס את כל ההתקדמות?')) {
-    localStorage.removeItem('pesach25'); location.reload();
+function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+
+function continueMap() {
+  document.getElementById('reveal-view').style.display = 'none';
+  startFX('none');
+  showMap();
+  setTimeout(() => {
+    const avail = document.querySelector('.node.avail');
+    if(avail) window.scrollTo({top: avail.offsetTop - 150, behavior: 'smooth'});
+  }, 500);
+}
+
+function resetGame() {
+  if(confirm('האם לחזור חזרה למצרים ולהתחיל הכל מההתחלה?')) {
+    localStorage.removeItem('exodus_cinematic');
+    location.reload();
   }
 }
 
-// Events
-document.getElementById('overlay').addEventListener('click', e => { if(e.target===document.getElementById('overlay')) closeM(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeM(); });
+// Bind Enter key
+document.getElementById('r-input').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') checkAnswer();
+});
 
-build();
+init();
 </script>
 </body>
 </html>
