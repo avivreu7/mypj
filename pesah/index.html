@@ -83,7 +83,7 @@ body {
 /* ================== PROLOGUE / INSTRUCTIONS ================== */
 #prologue-view {
   position: fixed; inset: 0; z-index: 900;
-  background: #050505; display: none; overflow-y: auto; opacity: 0; transition: opacity 1.5s ease;
+  background: #050505; display: none; overflow-y: auto; opacity: 0; transition: opacity 1s ease;
   -webkit-overflow-scrolling: touch;
 }
 .prologue-inner {
@@ -116,37 +116,40 @@ body {
   display: none; opacity: 0; transition: opacity 1.5s ease;
 }
 
-.map-header { text-align: center; margin-bottom: 80px; position: relative; z-index: 20; }
+/* z-index lowered to not block nodes on small screens */
+.map-header { text-align: center; margin-bottom: 80px; position: relative; z-index: 1; }
 .map-title { font-family: var(--font-epic); font-size: 3rem; color: var(--c-sand); margin-bottom: 5px; }
 .map-hiero { font-size: 1.5rem; letter-spacing: 15px; color: var(--c-gold-dim); opacity: 0.5; }
 
-.timeline { max-width: 600px; margin: 0 auto; position: relative; z-index: 20; }
+/* Timeline given higher z-index to stay above everything */
+.timeline { max-width: 600px; margin: 0 auto; position: relative; z-index: 50; }
 .timeline-line { position: absolute; right: 39px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(180deg, var(--c-gold-dim), transparent); opacity: 0.3; z-index: 0; }
 
-/* NODE STYLING - FIXED FOR CLICKS */
+/* NODE STYLING - FULLY CLICKABLE */
 .node { 
   display: flex; align-items: center; gap: 30px; margin-bottom: 50px; 
-  position: relative; z-index: 30; transition: all 0.4s ease; cursor: pointer;
+  position: relative; z-index: 60; transition: all 0.4s ease; cursor: pointer;
   -webkit-tap-highlight-color: transparent; padding: 10px 0;
 }
 .node.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 .node.avail { transform: translateX(10px); }
 .node.avail:hover, .node.avail:active { transform: translateX(20px); }
 
-.n-icon { width: 80px; height: 80px; border-radius: 5px; transform: rotate(45deg); background: var(--c-surface); border: 1px solid var(--c-sand-dark); display: flex; align-items: center; justify-content: center; transition: all 0.5s; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex-shrink: 0; z-index: 2; position: relative; }
+/* Remove pointer-events from inner elements so the parent .node catches the click perfectly */
+.n-icon { width: 80px; height: 80px; border-radius: 5px; transform: rotate(45deg); background: var(--c-surface); border: 1px solid var(--c-sand-dark); display: flex; align-items: center; justify-content: center; transition: all 0.5s; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex-shrink: 0; z-index: 2; position: relative; pointer-events: none; }
 .n-icon-inner { transform: rotate(-45deg); font-size: 2rem; color: var(--c-sand); pointer-events: none; }
 
 .node.avail .n-icon { border-color: var(--c-gold); box-shadow: 0 0 20px rgba(212,175,55,0.2); }
 .node.done .n-icon { border-color: #4a5d23; background: #0b1205; }
 .node.done .n-icon-inner { color: #8fbc8f; }
 
-.n-content { flex: 1; text-align: right; pointer-events: auto; /* Fixed: allows clicking the text */ }
+.n-content { flex: 1; text-align: right; pointer-events: none; }
 .n-ep { font-family: var(--font-ui); font-size: 0.9rem; color: var(--c-gold-dim); letter-spacing: 2px; display: block; margin-bottom: 5px; }
 .n-title { font-family: var(--font-epic); font-size: 1.8rem; color: var(--c-sand); font-weight: 300; }
 
 /* ================== ROOM VIEW ================== */
 #room-view {
-  position: fixed; inset: 0; z-index: 50;
+  position: fixed; inset: 0; z-index: 200;
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   padding: 20px; opacity: 0; pointer-events: none;
   background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.95) 80%), var(--theme-bg);
@@ -154,10 +157,10 @@ body {
 }
 #room-view.active { opacity: 1; pointer-events: auto; }
 
-.r-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--c-sand); font-size: 2.5rem; cursor: pointer; transition: all 0.3s; z-index: 60; opacity: 0.6; -webkit-tap-highlight-color: transparent; }
+.r-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--c-sand); font-size: 2.5rem; cursor: pointer; transition: all 0.3s; z-index: 210; opacity: 0.6; -webkit-tap-highlight-color: transparent; }
 .r-close:hover, .r-close:active { opacity: 1; transform: scale(1.1); }
 
-.r-container { max-width: 800px; width: 100%; position: relative; z-index: 55; text-align: center; margin: auto; padding-top: 40px; }
+.r-container { max-width: 800px; width: 100%; position: relative; z-index: 205; text-align: center; margin: auto; padding-top: 40px; }
 
 .r-num { font-family: var(--font-ui); font-size: 1rem; letter-spacing: 5px; color: var(--theme-main); opacity: 0.7; margin-bottom: 20px; display: block; }
 .r-title { font-family: var(--font-epic); font-size: clamp(2.5rem, 6vw, 4rem); color: var(--c-sand); margin-bottom: 40px; font-weight: 300; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
@@ -178,7 +181,7 @@ body {
 .r-hint-text { display: none; font-size: 1.1rem; color: var(--c-sand); font-style: italic; animation: fadeIn 0.5s; font-family: var(--font-epic); padding: 0 15px; }
 
 /* ================== REVEAL & VICTORY ================== */
-.overlay-view { position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 20px; text-align: center; animation: fadeIn 1s ease; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.overlay-view { position: fixed; inset: 0; z-index: 300; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 20px; text-align: center; animation: fadeIn 1s ease; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .overlay-inner { max-width: 600px; margin: auto; padding: 40px 0; }
 
 .rev-title { font-family: var(--font-epic); font-size: 3rem; color: var(--theme-main); margin-bottom: 30px; font-weight: 300; }
@@ -187,7 +190,7 @@ body {
 
 .v-title { font-family: var(--font-epic); font-size: clamp(4rem, 12vw, 7rem); color: var(--c-gold); margin-bottom: 20px; line-height: 1; text-shadow: 0 0 40px rgba(212,175,55,0.4); }
 
-.rst { display: block; margin: 50px auto; background: none; border: none; color: var(--c-gold-dim); cursor: pointer; font-family: var(--font-ui); letter-spacing: 1px; opacity: 0.5; transition: 0.3s; padding: 15px; -webkit-tap-highlight-color: transparent; text-decoration: underline; }
+.rst { display: block; margin: 50px auto; background: none; border: none; color: var(--c-gold-dim); cursor: pointer; font-family: var(--font-ui); letter-spacing: 1px; opacity: 0.5; transition: 0.3s; padding: 15px; -webkit-tap-highlight-color: transparent; text-decoration: underline; position: relative; z-index: 50; }
 .rst:hover { opacity: 1; }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -297,7 +300,7 @@ body {
 </div>
 
 <script>
-// ================= DATA (THE PRINCE OF EGYPT EDITION) =================
+// ================= DATA =================
 const RIDDLES = [
   {
     tt: 'יסודות האימפריה', ic: '𓊃', 
@@ -423,7 +426,7 @@ function startFX(type) {
   cancelAnimationFrame(animFrame); particles = []; ctx.clearRect(0,0,canvas.width,canvas.height);
   if(type === 'none') { canvas.style.opacity = 0; return; }
   canvas.style.opacity = 1;
-  let count = window.innerWidth < 600 ? 40 : 100; // Optimize for mobile
+  let count = window.innerWidth < 600 ? 40 : 100;
   for(let i=0; i<count; i++) particles.push(new Particle(type));
   function loop() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -437,7 +440,6 @@ function startFX(type) {
 
 function init() {
   if (state.solved.some(x=>x)) {
-    // Already started playing, skip splash & prologue
     document.getElementById('splash-view').style.display = 'none';
     document.getElementById('prologue-view').style.display = 'none';
     showMap();
@@ -451,6 +453,8 @@ function showPrologue() {
     splash.style.display = 'none';
     const prologue = document.getElementById('prologue-view');
     prologue.style.display = 'block';
+    // Pointer-events none trick to prevent blockings during transition
+    splash.style.pointerEvents = 'none';
     setTimeout(() => prologue.style.opacity = 1, 50);
   }, 1000);
 }
@@ -460,6 +464,7 @@ function startJourney() {
   prologue.style.opacity = 0;
   setTimeout(() => {
     prologue.style.display = 'none';
+    prologue.style.pointerEvents = 'none';
     showMap();
   }, 1000);
 }
@@ -484,9 +489,9 @@ function renderNodes() {
     const div = document.createElement('div');
     div.className = `node ${done ? 'done' : avail ? 'avail' : 'locked'}`;
     
-    // Explicit click listener for touch screens
+    // Explicit hardcoded click event that passes directly to the function
     if(avail || done) {
-      div.addEventListener('click', () => openRoom(i));
+      div.setAttribute('onclick', `openRoom(${i})`);
     }
     
     div.innerHTML = `
@@ -508,16 +513,15 @@ function renderNodes() {
   }
 }
 
-function openRoom(i) {
+// Must be global for inline onclick
+window.openRoom = function(i) {
   currentRoom = i;
   const r = RIDDLES[i];
   
-  // Setup Theme
   document.documentElement.style.setProperty('--theme-main', r.theme);
   document.documentElement.style.setProperty('--theme-bg', r.bg);
   startFX(r.fx);
   
-  // Populate Content
   document.getElementById('r-num').textContent = `— תחנה ${i+1} —`;
   document.getElementById('r-title').textContent = r.tt;
   document.getElementById('r-riddle').innerHTML = r.st;
@@ -530,7 +534,6 @@ function openRoom(i) {
   document.getElementById('r-hint').textContent = r.hi;
   document.getElementById('hint-btn').style.display = 'inline-block';
   
-  // Transition Views
   document.getElementById('map-view').style.opacity = 0;
   setTimeout(() => {
     document.getElementById('map-view').style.display = 'none';
@@ -540,7 +543,7 @@ function openRoom(i) {
     
     document.getElementById('r-interaction').style.display = state.solved[i] ? 'none' : 'block';
   }, 500);
-}
+};
 
 function closeRoom() {
   document.getElementById('room-view').classList.remove('active');
@@ -610,7 +613,6 @@ function resetGame() {
   }
 }
 
-// Bind Enter key
 document.getElementById('r-input').addEventListener('keypress', function(e) {
   if (e.key === 'Enter') checkAnswer();
 });
