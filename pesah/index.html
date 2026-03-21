@@ -16,7 +16,6 @@
   --c-sand: #e8d5b5;
   --c-sand-dark: #8c7b64;
   --c-red: #8b0000;
-  --c-blue: #003366;
   
   --font-epic: 'Frank Ruhl Libre', serif;
   --font-ui: 'Heebo', sans-serif;
@@ -39,16 +38,31 @@ body {
 /* ================== GLOBAL FX ================== */
 #fx-canvas {
   position: fixed; inset: 0; width: 100%; height: 100%;
-  z-index: 0; pointer-events: none; opacity: 0;
+  z-index: 1; pointer-events: none; opacity: 0;
   transition: opacity 2s ease;
 }
+
+/* ================== SHARED BUTTONS ================== */
+.btn-epic {
+  background: transparent; border: 1px solid var(--c-gold); color: var(--c-gold);
+  padding: 15px 40px; font-family: var(--font-ui); font-size: 1.2rem; letter-spacing: 2px;
+  cursor: pointer; position: relative; overflow: hidden; transition: all 0.5s;
+  z-index: 10;
+}
+.btn-epic::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent);
+  transition: all 0.5s; z-index: -1;
+}
+.btn-epic:hover { background: rgba(212,175,55,0.1); box-shadow: 0 0 20px rgba(212,175,55,0.3); transform: translateY(-2px); }
+.btn-epic:hover::before { left: 100%; transition: all 0.8s; }
 
 /* ================== SPLASH SCREEN ================== */
 #splash-view {
   position: fixed; inset: 0; z-index: 1000;
   background: radial-gradient(circle at center, #1a1610 0%, #000 100%);
   display: flex; flex-direction: column; justify-content: center; align-items: center;
-  transition: opacity 1.5s ease;
+  transition: opacity 1s ease;
 }
 .splash-logo {
   font-family: var(--font-epic); font-size: clamp(3rem, 10vw, 7rem);
@@ -61,22 +75,33 @@ body {
 }
 .splash-sub {
   font-family: var(--font-ui); font-size: 1.2rem; color: var(--c-gold-dim);
-  letter-spacing: 8px; text-transform: uppercase; margin-bottom: 60px;
+  letter-spacing: 8px; text-transform: uppercase; margin-bottom: 60px; text-align: center;
 }
-.btn-epic {
-  background: transparent; border: 1px solid var(--c-gold); color: var(--c-gold);
-  padding: 15px 40px; font-family: var(--font-ui); font-size: 1.2rem; letter-spacing: 2px;
-  cursor: pointer; position: relative; overflow: hidden; transition: all 0.5s;
-}
-.btn-epic::before {
-  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent);
-  transition: all 0.5s;
-}
-.btn-epic:hover { background: rgba(212,175,55,0.1); box-shadow: 0 0 20px rgba(212,175,55,0.3); }
-.btn-epic:hover::before { left: 100%; transition: all 0.8s; }
-
 @keyframes slowScale { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+/* ================== PROLOGUE / INSTRUCTIONS ================== */
+#prologue-view {
+  position: fixed; inset: 0; z-index: 900;
+  background: #050505; display: none; flex-direction: column; justify-content: center; align-items: center;
+  padding: 30px; opacity: 0; transition: opacity 1.5s ease; overflow-y: auto; text-align: center;
+}
+.prologue-title {
+  font-family: var(--font-epic); font-size: 2.5rem; color: var(--c-gold); margin-bottom: 30px;
+  border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px;
+}
+.prologue-text {
+  font-size: 1.2rem; line-height: 1.8; color: var(--c-sand); max-width: 700px; font-weight: 300; margin-bottom: 40px;
+}
+.prologue-rules {
+  text-align: right; max-width: 600px; margin: 0 auto 50px; background: rgba(212,175,55,0.05);
+  padding: 25px; border-radius: 10px; border-right: 3px solid var(--c-gold);
+}
+.prologue-rules li {
+  margin-bottom: 15px; font-size: 1.1rem; list-style: none; position: relative; padding-right: 25px;
+}
+.prologue-rules li::before {
+  content: '✦'; position: absolute; right: 0; color: var(--c-gold-dim); font-size: 1.2rem;
+}
 
 /* ================== MAP VIEW ================== */
 #map-view {
@@ -86,43 +111,43 @@ body {
   display: none; opacity: 0; transition: opacity 1.5s ease;
 }
 
-.map-header { text-align: center; margin-bottom: 80px; }
+.map-header { text-align: center; margin-bottom: 80px; position: relative; z-index: 20; }
 .map-title { font-family: var(--font-epic); font-size: 3rem; color: var(--c-sand); margin-bottom: 5px; }
 .map-hiero { font-size: 1.5rem; letter-spacing: 15px; color: var(--c-gold-dim); opacity: 0.5; }
 
-.timeline { max-width: 600px; margin: 0 auto; position: relative; }
-.timeline-line { position: absolute; right: 39px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(180deg, var(--c-gold-dim), transparent); z-index: 0; opacity: 0.3; }
+.timeline { max-width: 600px; margin: 0 auto; position: relative; z-index: 20; }
+.timeline-line { position: absolute; right: 39px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(180deg, var(--c-gold-dim), transparent); opacity: 0.3; z-index: -1; }
 
-.node { display: flex; align-items: center; gap: 30px; margin-bottom: 50px; position: relative; z-index: 1; transition: all 0.4s ease; cursor: pointer; }
-.node.locked { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
+.node { display: flex; align-items: center; gap: 30px; margin-bottom: 50px; position: relative; transition: all 0.4s ease; cursor: pointer; }
+.node.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 .node.avail { transform: translateX(10px); }
 .node.avail:hover { transform: translateX(20px); }
 
-.n-icon { width: 80px; height: 80px; border-radius: 5px; transform: rotate(45deg); background: var(--c-surface); border: 1px solid var(--c-sand-dark); display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.5s; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex-shrink: 0; }
-.n-icon-inner { transform: rotate(-45deg); font-size: 2rem; color: var(--c-sand); }
+.n-icon { width: 80px; height: 80px; border-radius: 5px; transform: rotate(45deg); background: var(--c-surface); border: 1px solid var(--c-sand-dark); display: flex; align-items: center; justify-content: center; transition: all 0.5s; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex-shrink: 0; z-index: 2; position: relative; }
+.n-icon-inner { transform: rotate(-45deg); font-size: 2rem; color: var(--c-sand); pointer-events: none; }
 
 .node.avail .n-icon { border-color: var(--c-gold); box-shadow: 0 0 20px rgba(212,175,55,0.2); }
 .node.done .n-icon { border-color: #4a5d23; background: #0b1205; }
 .node.done .n-icon-inner { color: #8fbc8f; }
 
-.n-content { flex: 1; text-align: right; }
+.n-content { flex: 1; text-align: right; pointer-events: none; }
 .n-ep { font-family: var(--font-ui); font-size: 0.9rem; color: var(--c-gold-dim); letter-spacing: 2px; }
 .n-title { font-family: var(--font-epic); font-size: 1.8rem; color: var(--c-sand); font-weight: 300; }
 
 /* ================== ROOM VIEW ================== */
 #room-view {
-  position: fixed; inset: 0; z-index: 20;
+  position: fixed; inset: 0; z-index: 50;
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   padding: 20px; opacity: 0; pointer-events: none;
-  background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.9) 80%), var(--theme-bg);
-  transition: opacity 1s ease; overflow-y: auto;
+  background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.95) 80%), var(--theme-bg);
+  transition: opacity 0.8s ease; overflow-y: auto;
 }
 #room-view.active { opacity: 1; pointer-events: auto; }
 
-.r-close { position: absolute; top: 30px; right: 30px; background: none; border: none; color: var(--c-sand); font-size: 2rem; cursor: pointer; transition: all 0.3s; z-index: 30; opacity: 0.5; }
+.r-close { position: absolute; top: 30px; right: 30px; background: none; border: none; color: var(--c-sand); font-size: 2rem; cursor: pointer; transition: all 0.3s; z-index: 60; opacity: 0.5; }
 .r-close:hover { opacity: 1; transform: scale(1.1); }
 
-.r-container { max-width: 800px; width: 100%; position: relative; z-index: 2; text-align: center; }
+.r-container { max-width: 800px; width: 100%; position: relative; z-index: 55; text-align: center; }
 
 .r-num { font-family: var(--font-ui); font-size: 1rem; letter-spacing: 5px; color: var(--theme-main); opacity: 0.7; margin-bottom: 20px; display: block; }
 .r-title { font-family: var(--font-epic); font-size: clamp(2.5rem, 6vw, 4rem); color: var(--c-sand); margin-bottom: 40px; font-weight: 300; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
@@ -146,12 +171,12 @@ body {
 .overlay-view { position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 20px; text-align: center; animation: fadeIn 1s ease; overflow-y: auto; }
 
 .rev-title { font-family: var(--font-epic); font-size: 3rem; color: var(--theme-main); margin-bottom: 30px; font-weight: 300; }
-.rev-text { font-family: var(--font-ui); font-size: 1.2rem; color: var(--c-text); max-width: 600px; line-height: 1.8; margin-bottom: 50px; font-weight: 300; }
-.rev-text strong { color: var(--c-sand); font-weight: 500; }
+.rev-text { font-family: var(--font-ui); font-size: 1.3rem; color: var(--c-text); max-width: 600px; line-height: 1.8; margin-bottom: 50px; font-weight: 300; }
+.rev-text strong { color: var(--c-sand); font-weight: 500; font-size: 1.1em; }
 
 .v-title { font-family: var(--font-epic); font-size: clamp(4rem, 12vw, 7rem); color: var(--c-gold); margin-bottom: 20px; line-height: 1; text-shadow: 0 0 40px rgba(212,175,55,0.4); }
 
-.rst { display: block; margin: 50px auto; background: none; border: none; color: var(--c-gold-dim); cursor: pointer; font-family: var(--font-ui); letter-spacing: 1px; opacity: 0.5; transition: 0.3s; }
+.rst { display: block; margin: 50px auto; background: none; border: none; color: var(--c-gold-dim); cursor: pointer; font-family: var(--font-ui); letter-spacing: 1px; opacity: 0.5; transition: 0.3s; position: relative; z-index: 20; }
 .rst:hover { opacity: 1; }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -164,6 +189,7 @@ body {
   .n-icon-inner { font-size: 1.5rem; }
   .n-title { font-size: 1.4rem; }
   .r-close { top: 15px; right: 15px; font-size: 1.5rem; }
+  .prologue-text, .prologue-rules li { font-size: 1rem; }
 }
 </style>
 </head>
@@ -174,7 +200,21 @@ body {
 <div id="splash-view">
   <div class="splash-logo">נסיך מצרים</div>
   <div class="splash-sub">מסע מתוך האפלה אל האור</div>
-  <button class="btn-epic" onclick="startJourney()">שלח את עמי</button>
+  <button class="btn-epic" onclick="showPrologue()">שלח את עמי</button>
+</div>
+
+<div id="prologue-view">
+  <div class="prologue-title">דברי ימי גושן</div>
+  <div class="prologue-text">
+    דורות שלמים כורעים בני עמנו תחת נטל הפירמידות והשעבוד של פרעה. 
+    אך רוח של שינוי מנשבת מן המדבר. הדרך אל החירות לא תיכבש בכוח הזרוע בלבד, אלא בתבונה, באמונה ובהבנת העבר. לפניכם מגילת המסע.
+  </div>
+  <ul class="prologue-rules">
+    <li><strong>הדרך נעולה:</strong> תוכלו להתקדם לתחנה הבאה רק לאחר שתפענחו את סוד התחנה הנוכחית.</li>
+    <li><strong>קראו בין השורות:</strong> התשובות אינן מונחות על פני השטח. הקדישו זמן לחשיבה וחפשו את המשמעות הסמלית המסתתרת בכל חידה.</li>
+    <li><strong>האזינו לקול הפנימי:</strong> נתקעתם בדרך? לחצו על "קול פנימי..." כדי לקבל הכוונה משמעותית.</li>
+  </ul>
+  <button class="btn-epic" onclick="startJourney()">שאו את המטה</button>
 </div>
 
 <div id="map-view">
@@ -200,7 +240,7 @@ body {
       <div class="r-input-wrap">
         <input type="text" id="r-input" class="r-input" placeholder="חשפו את התשובה..." autocomplete="off">
       </div>
-      <button class="btn-epic" style="border-radius:30px; font-size:1rem; padding:10px 30px;" onclick="checkAnswer()">פענח</button>
+      <button class="btn-epic" style="border-radius:30px; font-size:1rem; padding:10px 30px;" onclick="checkAnswer()">פענח סוד</button>
       
       <div class="r-hint-wrap">
         <button class="r-hint-btn" id="hint-btn" onclick="toggleHint()">קול פנימי...</button>
@@ -367,17 +407,29 @@ function startFX(type) {
 
 function init() {
   if (state.solved.some(x=>x)) {
-    // Already started playing, skip splash
+    // Already started playing, skip splash & prologue
     document.getElementById('splash-view').style.display = 'none';
+    document.getElementById('prologue-view').style.display = 'none';
     showMap();
   }
 }
 
-function startJourney() {
+function showPrologue() {
   const splash = document.getElementById('splash-view');
   splash.style.opacity = 0;
   setTimeout(() => {
     splash.style.display = 'none';
+    const prologue = document.getElementById('prologue-view');
+    prologue.style.display = 'flex';
+    setTimeout(() => prologue.style.opacity = 1, 50);
+  }, 1000);
+}
+
+function startJourney() {
+  const prologue = document.getElementById('prologue-view');
+  prologue.style.opacity = 0;
+  setTimeout(() => {
+    prologue.style.display = 'none';
     showMap();
   }, 1000);
 }
@@ -401,7 +453,11 @@ function renderNodes() {
     
     const div = document.createElement('div');
     div.className = `node ${done ? 'done' : avail ? 'avail' : 'locked'}`;
-    if(avail || done) div.onclick = () => openRoom(i);
+    
+    // Explicitly binding click event to open room
+    if(avail || done) {
+      div.onclick = function() { openRoom(i); };
+    }
     
     div.innerHTML = `
       <div class="n-content">
@@ -426,13 +482,13 @@ function openRoom(i) {
   currentRoom = i;
   const r = RIDDLES[i];
   
-  // Theme
+  // Setup Theme
   document.documentElement.style.setProperty('--theme-main', r.theme);
   document.documentElement.style.setProperty('--theme-bg', r.bg);
   startFX(r.fx);
   
-  // Content
-  document.getElementById('r-num').textContent = `— פאסאז' ${i+1} —`;
+  // Populate Content
+  document.getElementById('r-num').textContent = `— תחנה ${i+1} —`;
   document.getElementById('r-title').textContent = r.tt;
   document.getElementById('r-riddle').innerHTML = r.st;
   
@@ -442,8 +498,9 @@ function openRoom(i) {
   document.getElementById('r-hint-wrap').style.display = state.solved[i] ? 'none' : 'block';
   document.getElementById('r-hint').style.display = 'none';
   document.getElementById('r-hint').textContent = r.hi;
+  document.getElementById('hint-btn').style.display = 'inline-block';
   
-  // View change
+  // Transition Views
   document.getElementById('map-view').style.opacity = 0;
   setTimeout(() => {
     document.getElementById('map-view').style.display = 'none';
@@ -462,7 +519,7 @@ function closeRoom() {
     const map = document.getElementById('map-view');
     map.style.display = 'block';
     setTimeout(() => map.style.opacity = 1, 50);
-  }, 500);
+  }, 800);
 }
 
 function toggleHint() {
@@ -476,7 +533,7 @@ function toggleHint() {
 }
 
 function normalize(s) {
-  // מסיר רווחים מיותרים, סימני פיסוק, והופך למחרוזת נקייה
+  // Remove punctuation, extra spaces, and trim
   return s.trim().replace(/[.,!?"'״]/g, '').replace(/\s+/g, ' ');
 }
 
