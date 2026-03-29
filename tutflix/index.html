@@ -99,14 +99,14 @@
     </nav>
 
     <!-- אזור נושא מרכזי (Hero) -->
-    <div class="relative w-full h-[60vh] sm:h-[80vh] bg-cover bg-center" style="background-image: url('https://img.youtube.com/vi/_oQJSthHZn0/hqdefault.jpg');">
+    <div class="relative w-full h-[60vh] sm:h-[80vh] bg-cover bg-center" style="background-image: url('https://img.youtube.com/vi/OU1mnQSVXT0/hqdefault.jpg');">
         <div class="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/50 to-transparent"></div>
         <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-12 pb-12 sm:pb-24 slide-up">
-            <h1 class="text-4xl sm:text-6xl font-black mb-2 text-white drop-shadow-lg">שיר בוקר שאהבנו</h1>
-            <p class="text-lg sm:text-xl text-gray-300 mb-6 drop-shadow-md max-w-lg hidden sm:block">מתחילים את היום עם חיוך! שיר הבוקר שהילדים בגן תות הכי אוהבים לרקוד ולשיר יחד.</p>
+            <h1 class="text-4xl sm:text-6xl font-black mb-2 text-white drop-shadow-lg">שמחה רבה, אביב הגיע!</h1>
+            <p class="text-lg sm:text-xl text-gray-300 mb-6 drop-shadow-md max-w-lg hidden sm:block">מתכוננים לחג הפסח עם כל השירים האהובים מהגן. בואו לשיר יחד!</p>
             <div class="flex flex-wrap gap-3">
                 <!-- נגן עכשיו -->
-                <button onclick="openVideo('_oQJSthHZn0')" class="bg-white text-black font-bold py-2 px-5 sm:py-3 sm:px-8 rounded flex items-center gap-2 hover:bg-gray-200 transition shadow-lg">
+                <button onclick="openVideo('OU1mnQSVXT0')" class="bg-white text-black font-bold py-2 px-5 sm:py-3 sm:px-8 rounded flex items-center gap-2 hover:bg-gray-200 transition shadow-lg">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
                     <span>נגן עכשיו</span>
                 </button>
@@ -160,7 +160,6 @@
         <div class="w-full max-w-4xl bg-black rounded-lg overflow-hidden shadow-2xl relative transform scale-95 transition-transform duration-300" id="modal-content">
             <!-- אזור הווידאו -->
             <div class="relative w-full pt-[56.25%] bg-black"> <!-- יחס 16:9 -->
-                <!-- הוספנו מזהה ייחודי וכותרת לiframe לנגישות -->
                 <iframe id="youtube-player" title="נגן וידאו" class="absolute inset-0 w-full h-full" src="" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
             </div>
             
@@ -210,8 +209,18 @@
             { id: 'u2yJkxT87_U', cat: 'winter', title: 'שיר גשם ראשון' },
             { id: 'emT6y_324Xg', cat: 'winter', title: 'טיף וטף גשם' },
             { id: '8fo8Qq7O0eo', cat: 'winter', title: 'רוקדים בגשם' },
+
+            // אביב ופסח
+            { id: 'OFrRQMfst-M', cat: 'passover', title: 'איך יודעים שבא אביב' },
+            { id: 'zk7P4thK2-g', cat: 'passover', title: 'אביב היום' },
+            { id: 'XFcXcPnhQMw', cat: 'passover', title: 'משה בתיבה' },
+            { id: 'OU1mnQSVXT0', cat: 'passover', title: 'שמחה רבה' },
+            { id: 'jPCEcucr7S0', cat: 'passover', title: 'עבדים היינו' },
+            { id: 'VQX_achGHew', cat: 'passover', title: 'מה נשתנה' },
+            { id: 'YQz_Ef2SDpY', cat: 'passover', title: 'פרעה בפיג\'מה' },
+            { id: 'Y0Hsg7aW8nI', cat: 'passover', title: 'אחד מי יודע' },
             
-            // חגי ישראל
+            // חגי ישראל אחרים
             { id: 'ys-Bbq27Lb4', cat: 'holidays', title: 'ראש השנה 1' },
             { id: 'vv7XTuK9Qd8', cat: 'holidays', title: 'ראש השנה 2' },
             { id: 'D_wfjUTnZqE', cat: 'holidays', title: 'חנוכה - סביבון' },
@@ -241,6 +250,7 @@
         ];
 
         const categoriesConfig = [
+            { id: 'passover', title: 'אביב ופסח 🌸' },
             { id: 'dance', title: 'בוקר טוב ורוקדים ☀️' },
             { id: 'winter', title: 'חורף וגשם 🌧️' },
             { id: 'holidays', title: 'חגי ישראל 🎉' },
@@ -513,3 +523,5 @@
     </script>
 </body>
 </html>
+
+
