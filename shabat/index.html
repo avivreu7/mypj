@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>שבת שלום - מגן השמיים</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #020205; 
+            font-family: 'Heebo', sans-serif; 
+            touch-action: none; 
+            user-select: none;
+        }
+        
+        #canvas-container { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 1; 
+        }
+        
+        #ui-layer { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 10; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            opacity: 0; 
+            transition: opacity 3s ease-in-out; 
+            pointer-events: none; 
+            padding: 20px; 
+            text-align: center; 
+            background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%); 
+        }
+        
+        #ui-layer.visible { 
+            opacity: 1; 
+        }
+        
+        .gold-text { 
+            background: linear-gradient(to bottom, #FFDF73, #F4C430, #B8860B); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+            text-shadow: 0px 4px 25px rgba(244, 196, 48, 0.5); 
+        }
+        
+        .fade-in-up { 
+            transform: translateY(30px); 
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 3s ease-out; 
+        }
+        
+        #ui-layer.visible .fade-in-up { 
+            transform: translateY(0); 
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="skyCanvas"></canvas>
+    </div>
+    
+    <div id="ui-layer">
+        <h1 class="text-6xl md:text-8xl lg:text-9xl font-black gold-text mb-6 fade-in-up">שבת שלום</h1>
+        <p class="text-2xl md:text-4xl text-white font-light leading-relaxed max-w-4xl fade-in-up" style="transition-delay: 1.5s; text-shadow: 0 4px 15px rgba(0,0,0,1);">
+            גם מול שמיים רועשים,<br> אור התקווה שלנו ימשיך לזרוח.<br>
+            <span class="font-bold text-blue-400 mt-6 block text-3xl md:text-5xl">שבת שקטה, בטוחה ומבורכת.</span>
+        </p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('skyCanvas'); 
+        const ctx = canvas.getContext('2d'); 
+        const uiLayer = document.getElementById('ui-layer');
+        
+        let width, height, cityCanvas, cityCtx;
+        let stars = [], clouds = [], enemies = [], interceptors = [], explosions = [];
+        
+        // משתני ניהול מצב ויציבות
+        const TOTAL_MISSILES = 10;
+        let spawnedMissiles = 0; 
+        let destroyedMissiles = 0; 
+        let frameCount = 0; 
+        let isAnimationFinished = false; 
+
+        function init() { 
+            resize(); 
+            window.addEventListener('resize', () => {
+                clearTimeout(window.resizeTimer);
+                window.resizeTimer = setTimeout(resize, 200);
+            }); 
+            createStars(); 
+            createClouds(); 
+            createGlowingCity(); 
+            animate(); 
+            
+            setTimeout(() => {
+                triggerEndScreen();
+            }, 18000); 
+        }
+
+        function resize() { 
+            width = canvas.width = window.innerWidth; 
+            height = canvas.height = window.innerHeight; 
+            if (frameCount > 0) createGlowingCity(); 
+        }
+
+        function triggerEndScreen() {
+            if (!isAnimationFinished) {
+                isAnimationFinished = true;
+                uiLayer.classList.add('visible');
+            }
+        }
+
+        // --- סביבה ורקע ---
+        function createStars() { 
+            stars = []; 
+            for (let i = 0; i < 200; i++) { 
+                stars.push({ 
+                    x: Math.random() * width, 
+                    y: Math.random() * height * 0.7, 
+                    size: Math.random() * 1.5, 
+                    alpha: Math.random(), 
+                    speed: 0.01 + Math.random() * 0.02 
+                }); 
+            } 
+        }
+
+        function drawStars() { 
+            stars.forEach(star => { 
+                star.alpha += star.speed; 
+                if (star.alpha > 1 || star.alpha < 0.2) star.speed *= -1; 
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`; 
+                ctx.beginPath(); 
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2); 
+                ctx.fill(); 
+            }); 
+        }
+        
+        function createClouds() { 
+            clouds = [];
+            for (let i = 0; i < 5; i++) { 
+                clouds.push({ 
+                    x: Math.random() * width, 
+                    y: Math.random() * height * 0.2, 
+                    w: width * 0.6 + Math.random() * width * 0.4, 
+                    h: height * 0.1 + Math.random() * height * 0.2, 
+                    speed: 0.1 + Math.random() * 0.15 
+                }); 
+            } 
+        }
+
+        function drawClouds() { 
+            ctx.fillStyle = 'rgba(5, 8, 20, 0.4)'; 
+            clouds.forEach(cloud => { 
+                cloud.x += cloud.speed; 
+                if (cloud.x > width) cloud.x = -cloud.w; 
+                ctx.fillRect(cloud.x, cloud.y, cloud.w, cloud.h); 
+            }); 
+        }
+
+        function createGlowingCity() { 
+            if (!cityCanvas) {
+                cityCanvas = document.createElement('canvas'); 
+            }
+            cityCanvas.width = width; 
+            cityCanvas.height = height; 
+            cityCtx = cityCanvas.getContext('2d'); 
+            
+            const drawLayer = (color, maxH, minW, maxW, windowDensity) => { 
+                let x = 0; 
+                while (x < width) { 
+                    let w = minW + Math.random() * (maxW - minW);
+                    let h = height * maxH * (0.4 + Math.random() * 0.6);
+                    let y = height - h; 
+                    
+                    cityCtx.fillStyle = color; 
+                    cityCtx.fillRect(x, y, w, h); 
+                    
+                    for (let wx = x + 5; wx < x + w - 5; wx += 12) { 
+                        for (let wy = y + 10; wy < height - 10; wy += 15) { 
+                            if (Math.random() < windowDensity) { 
+                                const lightType = Math.random(); 
+                                if (lightType > 0.6) cityCtx.fillStyle = 'rgba(255, 240, 180, 0.9)'; 
+                                else if (lightType > 0.3) cityCtx.fillStyle = 'rgba(255, 255, 255, 0.8)'; 
+                                else cityCtx.fillStyle = 'rgba(180, 230, 255, 0.8)'; 
+                                cityCtx.fillRect(wx, wy, 5, 7); 
+                            } 
+                        } 
+                    } 
+                    x += w + 2; 
+                } 
+            }; 
+            
+            drawLayer('#0a0f18', 0.45, 40, 80, 0.8); 
+            drawLayer('#0d1322', 0.30, 50, 100, 0.85); 
+            drawLayer('#050810', 0.15, 60, 120, 0.7); 
+        }
+
+        // --- אובייקטים מתמטיים ---
+        
+        class Enemy {
+            constructor() { 
+                this.x = Math.random() * width; 
+                this.y = -50; 
+                const targetX = width * 0.2 + Math.random() * (width * 0.6); 
+                const angle = Math.atan2(height - this.y, targetX - this.x); 
+                this.speed = 1.2 + Math.random() * 0.6; 
+                this.vx = Math.cos(angle) * this.speed; 
+                this.vy = Math.sin(angle) * this.speed; 
+                this.active = true; 
+                this.interceptorSpawned = false; 
+                this.trail = []; 
+            }
+            
+            update() { 
+                if (this.y < height * 0.35) { 
+                    this.x += this.vx; 
+                    this.y += this.vy; 
+                } 
+                this.trail.push({x: this.x, y: this.y}); 
+                if (this.trail.length > 25) this.trail.shift(); 
+            }
+            
+            draw() { 
+                // ציור שובל עשן רגיל (ללא אפקטי הארה)
+                if (this.trail.length > 1) { 
+                    ctx.beginPath(); 
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y); 
+                    for (let p of this.trail) ctx.lineTo(p.x, p.y); 
+                    ctx.strokeStyle = 'rgba(200, 50, 0, 0.4)'; 
+                    ctx.lineWidth = 3; 
+                    ctx.stroke(); 
+                } 
+                
+                // ציור טיל ריאליסטי מוצק
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                const angle = Math.atan2(this.vy, this.vx);
+                ctx.rotate(angle);
+                
+                // להבת פליטה
+                ctx.fillStyle = '#ff6600';
+                ctx.beginPath();
+                ctx.moveTo(-12, -2);
+                ctx.lineTo(-12 - (Math.random() * 15 + 5), 0); // להבה משתנה
+                ctx.lineTo(-12, 2);
+                ctx.fill();
+
+                // גוף הטיל (אפור כהה)
+                ctx.fillStyle = '#4a4a4a';
+                ctx.fillRect(-12, -3, 20, 6);
+
+                // חרטום הטיל
+                ctx.fillStyle = '#2a2a2a';
+                ctx.beginPath();
+                ctx.moveTo(8, -3);
+                ctx.lineTo(16, 0);
+                ctx.lineTo(8, 3);
+                ctx.fill();
+
+                // סנפירים אחוריים
+                ctx.fillStyle = '#222';
+                ctx.beginPath(); ctx.moveTo(-12, -3); ctx.lineTo(-8, -7); ctx.lineTo(-4, -3); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(-12, 3); ctx.lineTo(-8, 7); ctx.lineTo(-4, 3); ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        class Interceptor {
+            constructor(targetEnemy) { 
+                this.x = width * 0.1 + Math.random() * (width * 0.8); 
+                this.y = height; 
+                this.target = targetEnemy; 
+                this.speed = 22 + Math.random() * 5; 
+                this.active = true; 
+                this.trail = []; 
+            }
+            
+            update() { 
+                if (!this.target.active) { 
+                    this.active = false; 
+                    return; 
+                } 
+                const dx = this.target.x - this.x;
+                const dy = this.target.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy); 
+                
+                if (dist < 40) { 
+                    this.active = false; 
+                    this.target.active = false; 
+                    createExplosion(this.target.x, this.target.y); 
+                    destroyedMissiles++; 
+                    return; 
+                } 
+                
+                const angle = Math.atan2(dy, dx); 
+                this.x += Math.cos(angle) * this.speed; 
+                this.y += Math.sin(angle) * this.speed; 
+                this.trail.push({x: this.x, y: this.y}); 
+                if (this.trail.length > 15) this.trail.shift(); 
+            }
+            
+            draw() { 
+                // ציור שובל עשן רגיל למיירט
+                if (this.trail.length > 1) { 
+                    ctx.beginPath(); 
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y); 
+                    for (let p of this.trail) ctx.lineTo(p.x, p.y); 
+                    ctx.strokeStyle = 'rgba(100, 180, 255, 0.5)'; 
+                    ctx.lineWidth = 3; 
+                    ctx.stroke(); 
+                } 
+                
+                // ציור טיל חץ ריאליסטי מוצק
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                const angle = Math.atan2(this.vy, this.vx);
+                ctx.rotate(angle);
+                
+                // להבת פליטה תכלת מוצקה
+                ctx.fillStyle = '#00ffff';
+                ctx.beginPath();
+                ctx.moveTo(-10, -2);
+                ctx.lineTo(-10 - (Math.random() * 20 + 10), 0); 
+                ctx.lineTo(-10, 2);
+                ctx.fill();
+
+                // גוף החץ (לבן/אפור בהיר)
+                ctx.fillStyle = '#e0e0e0';
+                ctx.fillRect(-10, -2.5, 20, 5);
+
+                // חרטום
+                ctx.fillStyle = '#888';
+                ctx.beginPath();
+                ctx.moveTo(10, -2.5);
+                ctx.lineTo(18, 0);
+                ctx.lineTo(10, 2.5);
+                ctx.fill();
+
+                // סנפירים
+                ctx.fillStyle = '#555';
+                ctx.beginPath(); ctx.moveTo(-10, -2.5); ctx.lineTo(-6, -6); ctx.lineTo(-2, -2.5); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(-10, 2.5); ctx.lineTo(-6, 6); ctx.lineTo(-2, 2.5); ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y) { 
+                this.x = x; 
+                this.y = y; 
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 8 + 2; 
+                this.vx = Math.cos(angle) * velocity; 
+                this.vy = Math.sin(angle) * velocity; 
+                this.life = 1.0; 
+                this.decay = Math.random() * 0.015 + 0.01; 
+                this.size = Math.random() * 3 + 1; 
+                const colors = ['255, 200, 50', '255, 255, 255', '100, 200, 255', '255, 100, 0']; 
+                this.color = colors[Math.floor(Math.random() * colors.length)]; 
+            }
+            
+            update() { 
+                this.x += this.vx; 
+                this.y += this.vy; 
+                this.vy += 0.08; 
+                this.life -= this.decay; 
+            }
+            
+            draw() { 
+                // ציור חלקיקים פשוט ללא אפקט הארה נוסף (ללא Lighter)
+                ctx.fillStyle = `rgba(${this.color}, ${this.life * 0.4})`; 
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2); 
+                ctx.fill(); 
+                
+                ctx.fillStyle = `rgba(${this.color}, ${this.life})`; 
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.fill(); 
+            }
+        }
+
+        function createExplosion(x, y) {
+            // ללא הבזקים, ללא רעידות מסך. רק יצירת החלקיקים.
+            for (let i = 0; i < 150; i++) {
+                explosions.push(new Particle(x, y));
+            }
+        }
+
+        // --- לולאה מרכזית ---
+        function animate() {
+            frameCount++; 
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.3)'; 
+            ctx.fillRect(0, 0, width, height);
+            
+            drawStars(); 
+            drawClouds();
+
+            // לוגיקת שיגורים
+            if (spawnedMissiles < TOTAL_MISSILES && frameCount % 60 === 0) { 
+                enemies.push(new Enemy()); 
+                spawnedMissiles++; 
+            }
+            
+            enemies.forEach(enemy => { 
+                if (enemy.active && !enemy.interceptorSpawned && enemy.y > 30) { 
+                    enemy.interceptorSpawned = true; 
+                    interceptors.push(new Interceptor(enemy)); 
+                } 
+            });
+
+            // עדכון ציור וניקוי מערכים
+            enemies.forEach(e => { if (e.active) { e.update(); e.draw(); }});
+            interceptors.forEach(i => { if (i.active) { i.update(); i.draw(); }});
+            
+            enemies = enemies.filter(e => e.active); 
+            interceptors = interceptors.filter(i => i.active);
+
+            for (let i = explosions.length - 1; i >= 0; i--) { 
+                explosions[i].update(); 
+                explosions[i].draw(); 
+                if (explosions[i].life <= 0) explosions.splice(i, 1); 
+            }
+            
+            if(cityCanvas) ctx.drawImage(cityCanvas, 0, 0);
+
+            // לוגיקת סיום
+            if (destroyedMissiles === TOTAL_MISSILES && explosions.length < 50) { 
+                setTimeout(() => {
+                    triggerEndScreen();
+                }, 500); 
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        init();
+    </script>
+</body>
+</html>
+
