@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>המרוץ למט"מון — שער רבין</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Secular+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* === RESET & ROOT === */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --gold:        #FFD200;
+            --gold-light:  #FFE566;
+            --gold-dark:   #b8960a;
+            --cyan:        #00F0FF;
+            --red:         #E50914;
+            --green:       #10B981;
+            --bg:          #020204;
+            --card:        #0B0B14;
+            --card-border: rgba(255,255,255,0.07);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--bg);
+            color: #d1d5db;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* === BACKGROUND ATMOSPHERE === */
+        #bg-atmo {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background:
+                radial-gradient(ellipse 75% 45% at 50% -5%,  rgba(255,210,0,0.09)   0%, transparent 65%),
+                radial-gradient(ellipse 55% 35% at 95% 95%,  rgba(0,240,255,0.07)   0%, transparent 60%),
+                radial-gradient(ellipse 40% 25% at 5%  75%,  rgba(229,9,20,0.05)    0%, transparent 55%);
+        }
+
+        /* SVG noise grain */
+        #bg-noise {
+            position: fixed; inset: 0; pointer-events: none; z-index: 1;
+            opacity: 0.028;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 250px;
+        }
+
+        /* === HERO === */
+        .hero {
+            position: relative; z-index: 2;
+            min-height: 100svh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 2.5rem 1rem 5rem;
+            overflow: hidden;
+        }
+
+        /* Light rays canvas */
+        #raysCanvas {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        /* === GLOBE === */
+        .globe-wrapper {
+            position: relative; z-index: 5;
+            width: 270px; height: 270px;
+            margin: 0 auto 0;
+            animation: float 7s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-14px); }
+        }
+
+        .globe-sphere {
+            position: absolute;
+            inset: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 36% 32%, #1e6a9c 0%, #093660 45%, #021a30 100%);
+            box-shadow:
+                inset -22px -22px 45px rgba(0,0,0,0.95),
+                inset 14px 14px 28px rgba(255,255,255,0.07),
+                0 0 70px rgba(0,240,255,0.14),
+                0 0 140px rgba(255,210,0,0.07);
+        }
+
+        .globe-grid {
+            position: absolute; inset: 22px;
+            border-radius: 50%;
+            background-image:
+                linear-gradient(rgba(255,210,0,0.18) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,210,0,0.18) 1px, transparent 1px);
+            background-size: 18px 18px;
+            mask-image: radial-gradient(circle, black 25%, transparent 68%);
+            -webkit-mask-image: radial-gradient(circle, black 25%, transparent 68%);
+            opacity: 0.45;
+        }
+
+        .globe-shine {
+            position: absolute; inset: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 34% 28%, rgba(255,255,255,0.13) 0%, transparent 52%);
+        }
+
+        /* Orbit rings — spinning */
+        .orb {
+            position: absolute; top: 50%; left: 50%;
+            border-radius: 50%;
+        }
+        .orb-1 {
+            width: 118%; height: 38%;
+            border: 2.5px solid rgba(0,240,255,0.75);
+            box-shadow: 0 0 14px rgba(0,240,255,0.5), inset 0 0 10px rgba(0,240,255,0.2);
+            transform: translate(-50%,-50%) rotateZ(-15deg) rotateX(70deg);
+            animation: spin1 11s linear infinite;
+        }
+        .orb-2 {
+            width: 142%; height: 54%;
+            border: 3px solid transparent;
+            border-top-color: var(--gold);
+            border-right-color: rgba(255,210,0,0.35);
+            box-shadow: 0 0 18px rgba(255,210,0,0.28);
+            transform: translate(-50%,-50%) rotateZ(38deg) rotateX(68deg);
+            animation: spin2 19s linear infinite reverse;
+        }
+        .orb-3 {
+            width: 162%; height: 64%;
+            border: 1.5px dashed rgba(255,255,255,0.09);
+            transform: translate(-50%,-50%) rotateZ(-58deg) rotateX(72deg);
+            animation: spin3 34s linear infinite;
+        }
+
+        @keyframes spin1 {
+            from { transform: translate(-50%,-50%) rotateZ(-15deg) rotateX(70deg) rotateY(0deg); }
+            to   { transform: translate(-50%,-50%) rotateZ(-15deg) rotateX(70deg) rotateY(360deg); }
+        }
+        @keyframes spin2 {
+            from { transform: translate(-50%,-50%) rotateZ(38deg) rotateX(68deg) rotateY(0deg); }
+            to   { transform: translate(-50%,-50%) rotateZ(38deg) rotateX(68deg) rotateY(360deg); }
+        }
+        @keyframes spin3 {
+            from { transform: translate(-50%,-50%) rotateZ(-58deg) rotateX(72deg) rotateY(0deg); }
+            to   { transform: translate(-50%,-50%) rotateZ(-58deg) rotateX(72deg) rotateY(360deg); }
+        }
+
+        /* Orbiting particles — injected by JS */
+        @keyframes orbitP {
+            from { transform: rotate(var(--s)) translateX(var(--r)); }
+            to   { transform: rotate(calc(var(--s) + 360deg)) translateX(var(--r)); }
+        }
+
+        /* === TITLE === */
+        .title-block {
+            position: relative; z-index: 5;
+            text-align: center;
+            margin-top: -0.5rem;
+        }
+
+        /* Depth shadow layer */
+        .title-depth {
+            font-family: 'Secular One', sans-serif;
+            font-size: clamp(4rem, 15vw, 7rem);
+            line-height: 0.9;
+            color: rgba(90, 55, 0, 0.55);
+            position: absolute;
+            top: 7px; left: 5px; right: -5px;
+            letter-spacing: -0.01em;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Actual gradient title */
+        .title-main {
+            font-family: 'Secular One', sans-serif;
+            font-size: clamp(4rem, 15vw, 7rem);
+            line-height: 0.9;
+            letter-spacing: -0.01em;
+            background: linear-gradient(162deg, #ffffff 0%, #fff5cc 28%, #FFD200 62%, #e07a00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 28px rgba(255,210,0,0.28));
+            position: relative;
+        }
+
+        /* Shimmer sweep on title */
+        .title-main::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.18) 50%, transparent 80%);
+            background-size: 200% 100%;
+            animation: shimmer 4s ease-in-out infinite 1.5s;
+            -webkit-text-fill-color: initial;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Subtitle ribbon */
+        .ribbon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: linear-gradient(90deg, transparent, rgba(0,60,90,0.85), rgba(0,110,150,0.9), rgba(0,60,90,0.85), transparent);
+            color: #fff;
+            font-family: 'Secular One', sans-serif;
+            letter-spacing: 0.38em;
+            font-size: 0.78rem;
+            padding: 0.45rem 2rem;
+            border-top: 1px solid rgba(0,240,255,0.3);
+            border-bottom: 1px solid rgba(0,240,255,0.3);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+            position: relative; z-index: 5;
+            margin-top: 1rem;
+        }
+
+        .ribbon-gem { color: var(--cyan); font-size: 0.4rem; }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute;
+            bottom: 1.75rem; left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+            color: rgba(255,255,255,0.28);
+            font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+            animation: bounce 2.8s ease-in-out infinite;
+        }
+        @keyframes bounce {
+            0%,100% { transform: translateX(-50%) translateY(0);   opacity: 0.35; }
+            50%      { transform: translateX(-50%) translateY(8px); opacity: 0.65; }
+        }
+
+        /* === SECTION COMMON === */
+        .wrap { max-width: 440px; margin: 0 auto; padding: 0 1rem; }
+
+        .reveal {
+            opacity: 0; transform: translateY(28px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal.vis { opacity: 1; transform: translateY(0); }
+
+        /* === TAGLINE SECTION === */
+        .tagline-sec {
+            position: relative; z-index: 2;
+            padding: 3.5rem 0 1.5rem;
+            text-align: center;
+        }
+
+        .tagline {
+            font-family: 'Secular One', sans-serif;
+            font-size: clamp(1.35rem, 5vw, 2rem);
+            color: white;
+            line-height: 1.35;
+        }
+        .tagline em { font-style: normal; color: var(--gold); }
+
+        .tagline-sub {
+            margin-top: 0.5rem;
+            color: rgba(255,255,255,0.32);
+            font-size: 0.82rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Horizontal rule */
+        .hr {
+            width: 60px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 1rem auto 0;
+        }
+
+        /* === DETAILS SECTION === */
+        .details-sec {
+            position: relative; z-index: 2;
+            padding: 1rem 0 2rem;
+        }
+
+        /* Date — hero card */
+        .date-card {
+            background: var(--card);
+            border: 1px solid rgba(255,210,0,0.22);
+            border-radius: 20px;
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 45px rgba(255,210,0,0.05), inset 0 1px 0 rgba(255,255,255,0.05);
+            margin-bottom: 0.85rem;
+        }
+        .date-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,210,0,0.65), transparent);
+        }
+        .date-card::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(255,210,0,0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .date-label {
+            font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase;
+            color: rgba(255,255,255,0.28); font-weight: 700; margin-bottom: 0.5rem;
+        }
+        .date-label i { color: var(--gold); margin-left: 0.4rem; }
+
+        .date-num {
+            font-family: 'Secular One', sans-serif;
+            font-size: 5.2rem; line-height: 1;
+            background: linear-gradient(158deg, #fff 0%, #ffe566 40%, #FFD200 70%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 22px rgba(255,210,0,0.32));
+        }
+        .date-year {
+            color: rgba(255,255,255,0.22);
+            font-size: 0.75rem; margin-top: 0.25rem;
+        }
+
+        /* Info grid */
+        .info-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 0.75rem; margin-bottom: 1rem;
+        }
+        .info-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.15rem 0.9rem;
+            display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .info-card:hover {
+            border-color: rgba(255,255,255,0.14);
+            box-shadow: 0 0 22px rgba(255,255,255,0.04);
+        }
+        .info-card.cyan { border-color: rgba(0,240,255,0.18); box-shadow: 0 0 28px rgba(0,240,255,0.06); }
+        .info-label {
+            font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+            color: rgba(255,255,255,0.28); font-weight: 700;
+        }
+        .info-val {
+            font-family: 'Secular One', sans-serif;
+            font-size: 1.55rem; color: white; line-height: 1;
+        }
+
+        /* === COUNTDOWN === */
+        .countdown-box {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.4rem 1rem;
+            position: relative; overflow: hidden;
+        }
+        .countdown-box::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,240,255,0.45), transparent);
+        }
+        .cd-label {
+            text-align: center;
+            font-size: 0.58rem; letter-spacing: 0.25em; text-transform: uppercase;
+            color: rgba(255,255,255,0.22); font-weight: 700; margin-bottom: 1rem;
+        }
+        .cd-row { display: flex; align-items: center; justify-content: center; gap: 0.2rem; }
+        .cd-unit { text-align: center; flex: 1; }
+        .cd-num {
+            font-family: 'Secular One', sans-serif;
+            font-size: 2.4rem; line-height: 1;
+            color: var(--cyan);
+            text-shadow: 0 0 22px rgba(0,240,255,0.55);
+            font-variant-numeric: tabular-nums;
+            transition: transform 0.15s;
+        }
+        .cd-num.tick { animation: cdtick 0.15s ease; }
+        @keyframes cdtick {
+            0%   { transform: translateY(-4px); opacity: 0.5; }
+            100% { transform: translateY(0);    opacity: 1; }
+        }
+        .cd-sub {
+            font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+            color: rgba(255,255,255,0.25); margin-top: 0.2rem;
+        }
+        .cd-sep {
+            font-family: 'Secular One', sans-serif;
+            font-size: 1.8rem; color: rgba(255,255,255,0.18);
+            align-self: flex-start; padding-top: 0.15rem;
+        }
+
+        /* === DIVIDER === */
+        .divider {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 2.5rem 1rem;
+            max-width: 440px; margin: 0 auto;
+        }
+        .div-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent); }
+        .div-icon { color: var(--gold); font-size: 0.68rem; opacity: 0.55; }
+
+        /* === RIDDLES SECTION === */
+        .riddles-sec { position: relative; z-index: 2; padding: 0 0 6rem; }
+
+        .sec-badge {
+            display: inline-block;
+            background: rgba(255,210,0,0.09);
+            border: 1px solid rgba(255,210,0,0.28);
+            color: var(--gold);
+            font-size: 0.58rem; letter-spacing: 0.24em; text-transform: uppercase;
+            padding: 0.28rem 0.85rem;
+            border-radius: 999px; font-weight: 700;
+            margin-bottom: 0.6rem;
+        }
+        .sec-title {
+            font-family: 'Secular One', sans-serif;
+            font-size: 1.75rem; color: white;
+        }
+        .sec-desc {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.78rem; line-height: 1.65;
+            margin-top: 0.45rem;
+            max-width: 310px; margin-left: auto; margin-right: auto;
+        }
+
+        /* Progress dots */
+        .dots { display: flex; justify-content: center; gap: 0.45rem; margin: 1.25rem 0 1.75rem; }
+        .dot {
+            width: 9px; height: 9px; border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.13);
+            transition: all 0.4s ease;
+        }
+        .dot.on   { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 9px var(--gold); }
+        .dot.done { background: var(--green); border-color: var(--green); box-shadow: 0 0 9px var(--green); }
+
+        /* Riddle cards */
+        .rcard {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.4rem 1.25rem;
+            position: relative; overflow: hidden;
+            transition: all 0.55s cubic-bezier(0.4,0,0.2,1);
+        }
+        .rcard::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,210,0,0.3), transparent);
+            opacity: 0; transition: opacity 0.5s;
+        }
+        .rcard.r-active::before { opacity: 1; }
+
+        .r-hidden {
+            opacity: 0; transform: translateY(18px) scale(0.97);
+            pointer-events: none; position: absolute; visibility: hidden;
+        }
+        .r-active {
+            opacity: 1; transform: translateY(0) scale(1);
+            pointer-events: auto; position: relative; visibility: visible;
+            margin-bottom: 0.75rem;
+        }
+        .r-solved {
+            border-color: rgba(16,185,129,0.35) !important;
+            box-shadow: 0 0 28px rgba(16,185,129,0.07) !important;
+        }
+        .r-solved::before {
+            background: linear-gradient(90deg, transparent, rgba(16,185,129,0.4), transparent) !important;
+            opacity: 1 !important;
+        }
+
+        .rnum {
+            font-family: 'Secular One', sans-serif;
+            font-size: 0.6rem; color: var(--gold);
+            letter-spacing: 0.24em; font-weight: 700;
+        }
+        .rq {
+            color: rgba(255,255,255,0.83);
+            font-size: 0.9rem; line-height: 1.7;
+            margin: 0.85rem 0 1.1rem; font-weight: 500;
+        }
+        .rinput {
+            flex: 1;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 0.7rem 0.9rem;
+            color: white; text-align: center;
+            font-family: 'Heebo', sans-serif;
+            font-weight: 700; font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            width: 100%;
+        }
+        .rinput:focus {
+            border-color: rgba(255,210,0,0.5);
+            box-shadow: 0 0 14px rgba(255,210,0,0.1);
+        }
+        .rinput.shake {
+            border-color: var(--red);
+            animation: shake 0.38s ease;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25%      { transform: translateX(-7px); }
+            75%      { transform: translateX(7px); }
+        }
+        .rbtn {
+            background: var(--gold); color: #000;
+            font-family: 'Heebo', sans-serif;
+            font-weight: 900; font-size: 0.85rem;
+            padding: 0.7rem 1.1rem;
+            border-radius: 12px; border: none;
+            cursor: pointer; white-space: nowrap;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+        .rbtn:hover { background: #ffe033; box-shadow: 0 0 20px rgba(255,210,0,0.3); }
+        .rbtn:active { transform: scale(0.95); }
+
+        /* === SUCCESS CARD === */
+        .success-card {
+            background: linear-gradient(140deg, #091812 0%, #0c2018 100%);
+            border: 1px solid rgba(16,185,129,0.28);
+            border-radius: 20px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 0 55px rgba(16,185,129,0.1);
+            position: relative; overflow: hidden;
+        }
+        .success-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(16,185,129,0.6), transparent);
+        }
+        .success-icon {
+            width: 66px; height: 66px;
+            background: rgba(16,185,129,0.13);
+            border: 1px solid rgba(16,185,129,0.38);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.25rem;
+            font-size: 1.5rem; color: var(--green);
+        }
+        .success-title {
+            font-family: 'Secular One', sans-serif;
+            font-size: 1.8rem; color: white; margin-bottom: 0.4rem;
+        }
+        .success-badge {
+            font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase;
+            color: var(--green); font-weight: 700; margin-bottom: 0.75rem;
+        }
+        .success-text { color: rgba(255,255,255,0.4); font-size: 0.85rem; line-height: 1.65; }
+
+        @media (max-width: 360px) {
+            .globe-wrapper { width: 230px; height: 230px; }
+            .cd-num { font-size: 1.95rem; }
+            .date-num { font-size: 4.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="bg-atmo"></div>
+    <div id="bg-noise"></div>
+
+    <!-- ════════════════════ HERO ════════════════════ -->
+    <header class="hero">
+        <canvas id="raysCanvas"></canvas>
+
+        <!-- GLOBE -->
+        <div class="globe-wrapper">
+            <div class="globe-sphere"></div>
+            <div class="globe-grid"></div>
+            <div class="globe-shine"></div>
+            <div style="position:absolute;inset:0;transform-style:preserve-3d;">
+                <div class="orb orb-1"></div>
+                <div class="orb orb-2"></div>
+                <div class="orb orb-3"></div>
+            </div>
+            <div id="particles" style="position:absolute;inset:0;"></div>
+        </div>
+
+        <!-- TITLE -->
+        <div class="title-block">
+            <div class="title-depth" aria-hidden="true">
+                <div>המרוץ</div>
+                <div>למט"מון</div>
+            </div>
+            <h1 class="title-main">
+                <div>המרוץ</div>
+                <div>למט"מון</div>
+            </h1>
+        </div>
+
+        <div class="ribbon">
+            <span class="ribbon-gem">◆</span>
+            האזור האישי
+            <span class="ribbon-gem">◆</span>
+        </div>
+
+        <div class="scroll-hint">
+            <span>גלול למטה</span>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+    </header>
+
+    <!-- ════════════════════ TAGLINE ════════════════════ -->
+    <section class="tagline-sec">
+        <div class="wrap">
+            <div class="reveal" style="text-align:center;">
+                <p class="tagline"><em>הרגע הזה</em> — חיכינו לו כל השנה</p>
+                <p class="tagline-sub">קבוצה אחת תזכה. השאלה היא — האם זו שלכם.</p>
+                <div class="hr"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════════ DETAILS ════════════════════ -->
+    <section class="details-sec">
+        <div class="wrap">
+
+            <!-- Date hero card -->
+            <div class="date-card reveal">
+                <p class="date-label"><i class="fa-regular fa-calendar"></i>יום האירוע</p>
+                <div class="date-num">15.06</div>
+                <p class="date-year">יוני 2026</p>
+            </div>
+
+            <!-- Time + Location -->
+            <div class="info-grid reveal" style="transition-delay:0.1s;">
+                <div class="info-card">
+                    <i class="fa-regular fa-clock" style="color:var(--red);font-size:1.2rem;"></i>
+                    <span class="info-label">התייצבות</span>
+                    <span class="info-val">07:30</span>
+                </div>
+                <div class="info-card cyan">
+                    <i class="fa-solid fa-location-dot" style="color:var(--cyan);font-size:1.2rem;"></i>
+                    <span class="info-label">זינוק</span>
+                    <span class="info-val" style="font-size:1.15rem;">שער רבין</span>
+                </div>
+            </div>
+
+            <!-- Countdown -->
+            <div class="countdown-box reveal" style="transition-delay:0.2s;">
+                <p class="cd-label">⏱ זמן עד לזינוק</p>
+                <div class="cd-row">
+                    <div class="cd-unit">
+                        <div class="cd-num" id="cd-d">--</div>
+                        <div class="cd-sub">ימים</div>
+                    </div>
+                    <div class="cd-sep">:</div>
+                    <div class="cd-unit">
+                        <div class="cd-num" id="cd-h">--</div>
+                        <div class="cd-sub">שעות</div>
+                    </div>
+                    <div class="cd-sep">:</div>
+                    <div class="cd-unit">
+                        <div class="cd-num" id="cd-m">--</div>
+                        <div class="cd-sub">דקות</div>
+                    </div>
+                    <div class="cd-sep">:</div>
+                    <div class="cd-unit">
+                        <div class="cd-num" id="cd-s">--</div>
+                        <div class="cd-sub">שניות</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ════════════════════ DIVIDER ════════════════════ -->
+    <div class="divider">
+        <div class="div-line"></div>
+        <i class="fa-solid fa-flag-checkered div-icon"></i>
+        <div class="div-line"></div>
+    </div>
+
+    <!-- ════════════════════ RIDDLES ════════════════════ -->
+    <section class="riddles-sec">
+        <div class="wrap">
+
+            <!-- Header -->
+            <div style="text-align:center;" class="reveal">
+                <span class="sec-badge">⚡ מבצע חימום</span>
+                <h2 class="sec-title">שבירת הצפנים</h2>
+                <p class="sec-desc">לפני שמתחילים, עליכם להוכיח חדות. פתרו את שלושת הצפנים — כל פתרון פותח את הבא אחריו.</p>
+            </div>
+
+            <!-- Progress dots -->
+            <div class="dots reveal">
+                <div class="dot on"  id="dot1"></div>
+                <div class="dot"     id="dot2"></div>
+                <div class="dot"     id="dot3"></div>
+            </div>
+
+            <!-- Riddles container -->
+            <div style="position:relative;min-height:200px;" id="rc">
+
+                <!-- Riddle 1 -->
+                <div id="r1" class="rcard r-active">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;">
+                        <span class="rnum">CODE_01</span>
+                        <span id="st1" style="font-size:0.62rem;color:rgba(255,255,255,0.28);letter-spacing:0.14em;text-transform:uppercase;"><i class="fa-solid fa-lock"></i> נעול</span>
+                    </div>
+                    <p class="rq">מה שייך לכם באופן בלעדי, אבל אנשים אחרים משתמשים בו הרבה יותר מכם?</p>
+                    <div style="display:flex;gap:0.5rem;">
+                        <input id="a1" class="rinput" type="text" placeholder="הכנס תשובה..."
+                            onkeydown="if(event.key==='Enter')chk(1,['השם שלי','שם','השם','שמי','השם שלך'])">
+                        <button class="rbtn" onclick="chk(1,['השם שלי','שם','השם','שמי','השם שלך'])">בדוק</button>
+                    </div>
+                </div>
+
+                <!-- Riddle 2 -->
+                <div id="r2" class="rcard r-hidden">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;">
+                        <span class="rnum">CODE_02</span>
+                        <span id="st2" style="font-size:0.62rem;color:rgba(255,255,255,0.28);letter-spacing:0.14em;text-transform:uppercase;"><i class="fa-solid fa-lock"></i> נעול</span>
+                    </div>
+                    <p class="rq">יש לי ערים אבל אין לי בתים. יש לי ימים ואוקיינוסים, אבל אין לי טיפת מים. מי אני?</p>
+                    <div style="display:flex;gap:0.5rem;">
+                        <input id="a2" class="rinput" type="text" placeholder="הכנס תשובה..."
+                            onkeydown="if(event.key==='Enter')chk(2,['מפה','מפת עולם','מפת ניווט'])">
+                        <button class="rbtn" onclick="chk(2,['מפה','מפת עולם','מפת ניווט'])">בדוק</button>
+                    </div>
+                </div>
+
+                <!-- Riddle 3 -->
+                <div id="r3" class="rcard r-hidden">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;">
+                        <span class="rnum">CODE_03</span>
+                        <span id="st3" style="font-size:0.62rem;color:rgba(255,255,255,0.28);letter-spacing:0.14em;text-transform:uppercase;"><i class="fa-solid fa-lock"></i> נעול</span>
+                    </div>
+                    <p class="rq">אני תמיד מתקדם קדימה ואף פעם לא הולך אחורה. אי אפשר לגעת בי, אבל אפשר למדוד אותי. מי אני?</p>
+                    <div style="display:flex;gap:0.5rem;">
+                        <input id="a3" class="rinput" type="text" placeholder="הכנס תשובה..."
+                            onkeydown="if(event.key==='Enter')chk(3,['זמן','הזמן','שעון'])">
+                        <button class="rbtn" onclick="chk(3,['זמן','הזמן','שעון'])">בדוק</button>
+                    </div>
+                </div>
+
+                <!-- Success -->
+                <div id="rwin" class="rcard r-hidden success-card">
+                    <div class="success-icon"><i class="fa-solid fa-rocket"></i></div>
+                    <h3 class="success-title">מוכנים לזינוק!</h3>
+                    <p class="success-badge">✓ ACCESS GRANTED</p>
+                    <p class="success-text">פיצחתם את כל הצפנים.<br>נתראה על קו הזינוק בשער רבין.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+    /* ─── PARTICLES ─── */
+    (function(){
+        const c = document.getElementById('particles');
+        const cfgs = [
+            { r:'118px', sz:6, col:'#FFD200', dur:'8s',  s:'0deg',   op:0.95 },
+            { r:'122px', sz:3, col:'#FFD200', dur:'13s', s:'90deg',  op:0.65 },
+            { r:'126px', sz:5, col:'#FFD200', dur:'17s', s:'180deg', op:0.85 },
+            { r:'123px', sz:3, col:'#00F0FF', dur:'10s', s:'270deg', op:0.75 },
+            { r:'120px', sz:2, col:'#FFD200', dur:'23s', s:'45deg',  op:0.5  },
+            { r:'128px', sz:2, col:'#00F0FF', dur:'19s', s:'135deg', op:0.6  },
+            { r:'125px', sz:2, col:'#ffffff', dur:'26s', s:'315deg', op:0.38 },
+            { r:'119px', sz:3, col:'#FFD200', dur:'15s', s:'225deg', op:0.72 },
+            { r:'130px', sz:2, col:'#FFD200', dur:'30s', s:'160deg', op:0.45 },
+        ];
+        cfgs.forEach(p => {
+            const el = document.createElement('div');
+            const h = p.sz / 2;
+            el.style.cssText = `
+                position:absolute; top:50%; left:50%;
+                width:${p.sz}px; height:${p.sz}px;
+                background:${p.col}; border-radius:50%;
+                box-shadow:0 0 ${p.sz*3}px ${p.col};
+                opacity:${p.op};
+                margin-top:-${h}px; margin-left:-${h}px;
+                animation:orbitP ${p.dur} linear infinite;
+                --r:${p.r}; --s:${p.s};
+            `;
+            c.appendChild(el);
+        });
+    })();
+
+    /* ─── RAYS ─── */
+    (function(){
+        const cv = document.getElementById('raysCanvas');
+        const ctx = cv.getContext('2d');
+        let angle = 0;
+
+        function resize() { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+
+        function draw() {
+            ctx.clearRect(0, 0, cv.width, cv.height);
+            const cx = cv.width / 2;
+            const cy = cv.height * 0.40;
+            const len = Math.max(cv.width, cv.height) * 0.85;
+            const N = 20;
+
+            for (let i = 0; i < N; i++) {
+                const a = (i / N) * Math.PI * 2 + angle;
+                const spread = 0.042;
+                const g = ctx.createLinearGradient(cx, cy, cx + Math.cos(a)*len, cy + Math.sin(a)*len);
+                g.addColorStop(0,   'rgba(255,210,0,0)');
+                g.addColorStop(0.3, 'rgba(255,210,0,0.045)');
+                g.addColorStop(1,   'rgba(255,210,0,0)');
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, len, a - spread, a + spread);
+                ctx.closePath();
+                ctx.fillStyle = g;
+                ctx.fill();
+            }
+            angle += 0.0008;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+
+    /* ─── COUNTDOWN ─── */
+    (function(){
+        const target = new Date('2026-06-15T07:30:00');
+        const pad = n => String(n).padStart(2,'0');
+        const els = { d: document.getElementById('cd-d'), h: document.getElementById('cd-h'), m: document.getElementById('cd-m'), s: document.getElementById('cd-s') };
+
+        function tick() {
+            const now = new Date();
+            const diff = target - now;
+            if (diff <= 0) { ['d','h','m','s'].forEach(k => els[k].textContent = '00'); return; }
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000)  / 60000);
+            const s = Math.floor((diff % 60000)    / 1000);
+
+            // Tick animation on seconds change
+            const newS = pad(s);
+            if (els.s.textContent !== newS) {
+                els.s.classList.remove('tick');
+                void els.s.offsetWidth;
+                els.s.classList.add('tick');
+            }
+            els.d.textContent = pad(d);
+            els.h.textContent = pad(h);
+            els.m.textContent = pad(m);
+            els.s.textContent = newS;
+        }
+        tick();
+        setInterval(tick, 1000);
+    })();
+
+    /* ─── SCROLL REVEAL ─── */
+    (function(){
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+        }, { threshold: 0.14 });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    })();
+
+    /* ─── RIDDLE LOGIC (fixed) ─── */
+    function norm(s) {
+        return s.trim().replace(/[.,!?״׳"'\u05f4\u05f3]/g,'').replace(/\s+/g,' ').toLowerCase();
+    }
+
+    function chk(n, answers) {
+        const inp = document.getElementById('a' + n);
+        const st  = document.getElementById('st' + n);
+        const card = document.getElementById('r' + n);
+        const val = norm(inp.value);
+        if (!val) return;
+
+        // Fixed: user answer should CONTAIN a correct key, not the reverse
+        const ok = answers.some(a => val.includes(norm(a)));
+
+        if (ok) {
+            inp.disabled = true;
+            inp.style.cssText += 'opacity:0.5;color:#10B981;border-color:rgba(16,185,129,0.45);';
+            st.innerHTML = '<i class="fa-solid fa-unlock" style="color:#10B981"></i> נפתח';
+            st.style.color = '#10B981';
+            card.classList.add('r-solved');
+
+            // Progress dot
+            const dot = document.getElementById('dot'+n);
+            dot.classList.remove('on'); dot.classList.add('done');
+
+            unlock(n);
+        } else {
+            inp.classList.add('shake');
+            const prev = inp.placeholder;
+            inp.value = '';
+            inp.placeholder = '✗ תשובה שגויה — נסו שוב';
+            setTimeout(() => { inp.classList.remove('shake'); inp.placeholder = 'הכנס תשובה...'; }, 1500);
+        }
+    }
+
+    function unlock(n) {
+        const nxt = n + 1;
+        setTimeout(() => {
+            if (nxt <= 3) {
+                const el = document.getElementById('r' + nxt);
+                el.classList.remove('r-hidden');
+                el.classList.add('r-active');
+                document.getElementById('dot'+nxt)?.classList.add('on');
+                setTimeout(() => el.scrollIntoView({ behavior:'smooth', block:'center' }), 80);
+            } else {
+                const win = document.getElementById('rwin');
+                win.classList.remove('r-hidden');
+                win.classList.add('r-active');
+                setTimeout(() => {
+                    win.scrollIntoView({ behavior:'smooth', block:'center' });
+                    confetti({ particleCount:90, spread:65, origin:{y:0.7}, colors:['#FFD200','#10B981','#00F0FF'] });
+                    setTimeout(() => {
+                        confetti({ particleCount:55, angle:55, spread:48, origin:{x:0,y:0.7}, colors:['#FFD200','#fff'] });
+                        confetti({ particleCount:55, angle:125, spread:48, origin:{x:1,y:0.7}, colors:['#10B981','#00F0FF'] });
+                    }, 280);
+                }, 180);
+            }
+        }, 380);
+    }
+    </script>
+</body>
+</html>
