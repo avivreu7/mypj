@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רשימת ציוד לטיול השנתי - כיתת חומוס</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #e8f5e9;
+            --primary-dark: #1b5e20;
+            --accent: #ff8f00;
+            --accent-light: #fff8e1;
+            --danger: #d32f2f;
+            --danger-light: #ffebee;
+            --bg: #f4f7f4;
+            --card-bg: #ffffff;
+            --text: #263238;
+            --text-muted: #607d8b;
+            --border: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        [data-theme="dark"] {
+            --primary: #66bb6a;
+            --primary-light: #1e3320;
+            --primary-dark: #81c784;
+            --accent: #ffb300;
+            --accent-light: #332914;
+            --danger: #ef5350;
+            --danger-light: #381a1a;
+            --bg: #121814;
+            --card-bg: #1c241e;
+            --text: #eceff1;
+            --text-muted: #90a4ae;
+            --border: #2e3b32;
+            --shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 60px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            padding: 28px 20px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        /* Alerts & Highlights */
+        .alerts-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-card {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .alert-danger {
+            background-color: var(--danger-light);
+            color: var(--danger);
+            border-right: 5px solid var(--danger);
+        }
+
+        .alert-warning {
+            background-color: var(--accent-light);
+            color: var(--text);
+            border-right: 5px solid var(--accent);
+        }
+
+        .alert-info {
+            background-color: var(--primary-light);
+            color: var(--text);
+            border-right: 5px solid var(--primary);
+        }
+
+        .alert-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        /* Progress Bar */
+        .progress-card {
+            background: var(--card-bg);
+            padding: 18px 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            border: 1px solid var(--border);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background-color: var(--border);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #66bb6a);
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 99px;
+        }
+
+        .progress-subtext {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Controls (Search & Filter) */
+        .controls-card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Add Item Section */
+        .add-item-card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .add-item-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-item-form {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .add-item-input {
+            flex: 2;
+            min-width: 180px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .add-item-select {
+            flex: 1;
+            min-width: 130px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .add-item-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .add-item-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Category Card */
+        .category-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .category-header {
+            padding: 16px 20px;
+            background: var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .category-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-badge {
+            background: var(--card-bg);
+            color: var(--text);
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+
+        .items-list {
+            list-style: none;
+        }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.15s;
+            cursor: pointer;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-row:hover {
+            background-color: rgba(0,0,0,0.015);
+        }
+
+        .item-row.checked {
+            background-color: rgba(46, 125, 50, 0.04);
+        }
+
+        .item-row.checked .item-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .item-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.2s;
+            background: var(--card-bg);
+        }
+
+        .item-row.checked .custom-checkbox {
+            background: var(--primary);
+            color: white;
+        }
+
+        .custom-checkbox::after {
+            content: "✓";
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .item-row.checked .custom-checkbox::after {
+            display: block;
+        }
+
+        .item-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .item-name-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .item-name {
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+
+        .item-note {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .badge-mandatory {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            font-size: 0.75rem;
+            padding: 1px 8px;
+            border-radius: 99px;
+            font-weight: 700;
+        }
+
+        [data-theme="dark"] .badge-mandatory {
+            background-color: #1b3b20;
+            color: #81c784;
+            border-color: #2e5c34;
+        }
+
+        .badge-subcat {
+            background-color: var(--bg);
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            padding: 1px 7px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            opacity: 0.7;
+            transition: opacity 0.2s, background 0.2s;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            background: var(--danger-light);
+        }
+
+        /* Action Footer Buttons */
+        .footer-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+
+        .action-btn {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+            transition: transform 0.15s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-btn.danger {
+            color: var(--danger);
+            border-color: var(--danger-light);
+        }
+
+        /* Celebration Banner */
+        .celebration {
+            display: none;
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+            color: white;
+            padding: 16px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            animation: popIn 0.4s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media print {
+            .theme-toggle, .controls-card, .add-item-card, .footer-actions, .delete-btn {
+                display: none !important;
+            }
+            .progress-card {
+                position: static;
+            }
+            body {
+                background: white;
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <button class="theme-toggle" id="themeToggle" title="החלף מצב תצוגה">🌙</button>
+        <h1>🎒 רשימת ציוד לטיול השנתי</h1>
+        <p>כיתת חומוס מתארגנת ליציאה!</p>
+    </header>
+
+    <!-- Important Alerts -->
+    <div class="alerts-section">
+        <div class="alert-card alert-danger">
+            <span class="alert-icon">⛔</span>
+            <div><strong>דגש חשוב:</strong> לא מוציאים את הפלאפון בזמן המסלול!</div>
+        </div>
+        <div class="alert-card alert-warning">
+            <span class="alert-icon">🥪</span>
+            <div><strong>אוכל ליום הראשון:</strong> חובה להביא ארוחת בוקר וצהריים מהבית (ארוחת ערב תוגש רק בשעה 19:00).</div>
+        </div>
+        <div class="alert-card alert-info">
+            <span class="alert-icon">ℹ️</span>
+            <div><strong>מידע נוסף:</strong> לא צריך תלבושת בית ספר | מקבלים מזרון בלינה | לא לשכוח את הסווצ'ר של הטיול!</div>
+        </div>
+    </div>
+
+    <!-- Celebration Banner -->
+    <div class="celebration" id="celebrationBanner">
+        🎉 כל הכבוד! ארזת את כל הציוד לטיול השנתי! שתהיה נסיעה טובה וטיול מהנה! 🚌⛰️
+    </div>
+
+    <!-- Sticky Progress Bar -->
+    <div class="progress-card">
+        <div class="progress-header">
+            <span>סטטוס אריזה</span>
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <div class="progress-subtext">
+            <span id="progressCount">0 מתוך 0 פריטים נארזו</span>
+            <span id="mandatoryStatus"></span>
+        </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="controls-card">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 חיפוש פריט ברשימה...">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">הכל</button>
+            <button class="filter-btn" data-filter="unpacked">טרם נארז</button>
+            <button class="filter-btn" data-filter="packed">נארז ✓</button>
+            <button class="filter-btn" data-filter="mandatory">🍀 חובה בלבד</button>
+        </div>
+    </div>
+
+    <!-- Add Custom Item -->
+    <div class="add-item-card">
+        <div class="add-item-title">➕ הוספת ציוד אישי לרשימה</div>
+        <form class="add-item-form" id="addItemForm">
+            <input type="text" id="customItemName" class="add-item-input" placeholder="לדוגמה: מצלמה, אוזניות, קלפים..." required>
+            <select id="customItemCategory" class="add-item-select">
+                <option value="personal">✨ ציוד אישי נוסף</option>
+                <option value="clothing">👕 לבוש</option>
+                <option value="backpack">🎒 תיק גב (נוח)</option>
+                <option value="bigbag">👜 תיק גדול</option>
+            </select>
+            <button type="submit" class="add-item-btn">הוסף</button>
+        </form>
+    </div>
+
+    <!-- Categories Container -->
+    <div id="categoriesContainer"></div>
+
+    <!-- Footer Actions -->
+    <div class="footer-actions">
+        <button class="action-btn" id="shareWhatsappBtn">📲 העתק סיכום לוואטסאפ</button>
+        <button class="action-btn" onclick="window.print()">🖨️ הדפסת רשימה</button>
+        <button class="action-btn danger" id="resetBtn">🔄 איפוס כל הסימונים</button>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'hummus_trip_packing_v1';
+    const THEME_KEY = 'hummus_trip_theme';
+
+    const DEFAULT_CATEGORIES = [
+        { id: 'clothing', title: '👕 לבוש (ליציאה ולמסלול)' },
+        { id: 'backpack', title: '🎒 תיק גב (נוח)' },
+        { id: 'bigbag', title: '👜 תיק גדול' },
+        { id: 'personal', title: '✨ ציוד אישי נוסף' }
+    ];
+
+    const DEFAULT_ITEMS = [
+        // לבוש
+        { id: 'c1', category: 'clothing', name: 'נעליים סגורות', note: 'מומלץ נעלי טיולים או נעלי ספורט', mandatory: false, checked: false },
+        { id: 'c2', category: 'clothing', name: 'חולצה עם שרוול', note: 'לא גופייה ולא חולצת בטן (לא צריך תלבושת בית ספר)', mandatory: false, checked: false },
+        { id: 'c3', category: 'clothing', name: 'כובע', note: 'לא מטפחת', mandatory: true, checked: false },
+        { id: 'c4', category: 'clothing', name: "הסווצ'ר של הטיול", note: 'לא לשכוח להביא!', mandatory: true, checked: false },
+
+        // תיק גב
+        { id: 'b1', category: 'backpack', name: '3 ליטר מים', note: 'חובה למסלול!', mandatory: true, checked: false },
+        { id: 'b2', category: 'backpack', name: 'ארוחת בוקר וצהריים ליום ראשון', note: 'תהיה ארוחת ערב רק בשעה 19:00', mandatory: true, checked: false },
+        { id: 'b3', category: 'backpack', name: '2 כובעים', note: 'חובה בתיק', mandatory: true, checked: false },
+        { id: 'b4', category: 'backpack', name: 'קרם הגנה', note: '', mandatory: false, checked: false },
+        { id: 'b5', category: 'backpack', name: 'חטיפים', note: '', mandatory: false, checked: false },
+        { id: 'b6', category: 'backpack', name: 'תרופות אישיות', note: 'במידת הצורך', mandatory: false, checked: false },
+        { id: 'b7', category: 'backpack', name: 'שפתון', note: 'נגד יובש', mandatory: false, checked: false },
+        { id: 'b8', category: 'backpack', name: 'שקית זבל', note: 'לשמירה על ניקיון המסלול', mandatory: false, checked: false },
+        { id: 'b9', category: 'backpack', name: 'נייר טואלט', note: '', mandatory: false, checked: false },
+
+        // תיק גדול
+        { id: 'g1', category: 'bigbag', name: 'שק שינה / שמיכה וכרית', note: 'מקבלים מזרון במקום הלינה', mandatory: false, checked: false },
+        { id: 'g2', category: 'bigbag', name: 'סדין', note: 'לכיסוי המזרון', mandatory: false, checked: false },
+        { id: 'g3', category: 'bigbag', name: 'מברשת שיניים', subcat: 'כלי רחצה', note: '', mandatory: false, checked: false },
+        { id: 'g4', category: 'bigbag', name: 'משחת שיניים', subcat: 'כלי רחצה', note: '', mandatory: false, checked: false },
+        { id: 'g5', category: 'bigbag', name: 'שמפו ומרכך', subcat: 'כלי רחצה', note: '', mandatory: false, checked: false },
+        { id: 'g6', category: 'bigbag', name: 'סבון גוף', subcat: 'כלי רחצה', note: '', mandatory: false, checked: false },
+        { id: 'g7', category: 'bigbag', name: 'מברשת שיער', subcat: 'כלי רחצה', note: '', mandatory: false, checked: false },
+        { id: 'g8', category: 'bigbag', name: 'דאודורנט', subcat: 'כלי רחצה', note: '', mandatory: false, checked: false },
+        { id: 'g9', category: 'bigbag', name: 'מגבת', note: '', mandatory: false, checked: false },
+        { id: 'g10', category: 'bigbag', name: 'שקית לבגדים המלוכלכים', note: '', mandatory: false, checked: false },
+        { id: 'g11', category: 'bigbag', name: 'כפכפים למקלחת', note: '', mandatory: false, checked: false },
+        { id: 'g12', category: 'bigbag', name: 'בגד ים למקלחת', note: 'למי שרוצה', mandatory: false, checked: false },
+        { id: 'g13', category: 'bigbag', name: 'שקית / תיק בד למקלחת', note: 'לקחת ציוד למקלחת בנוחות', mandatory: false, checked: false },
+        { id: 'g14', category: 'bigbag', name: 'בגדים חמים ללילה', note: '', mandatory: false, checked: false },
+        { id: 'g15', category: 'bigbag', name: 'בגדים להחלפה', note: '', mandatory: false, checked: false },
+        { id: 'g16', category: 'bigbag', name: 'פנס', note: '', mandatory: false, checked: false },
+        { id: 'g17', category: 'bigbag', name: 'אלתוש', note: 'דוחה יתושים', mandatory: false, checked: false },
+        { id: 'g18', category: 'bigbag', name: 'מטען לפלאפון', note: '', mandatory: false, checked: false },
+        { id: 'g19', category: 'bigbag', name: 'מטען נייד (Power Bank)', note: '', mandatory: false, checked: false },
+        { id: 'g20', category: 'bigbag', name: 'בקבוק מים נוסף', note: '', mandatory: false, checked: false },
+        { id: 'g21', category: 'bigbag', name: 'נעליים רק לכניסה למים', note: '', mandatory: false, checked: false }
+    ];
+
+    let items = [];
+    let currentFilter = 'all';
+    let searchQuery = '';
+
+    // Load Data from localStorage
+    function loadState() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                items = JSON.parse(saved);
+            } catch (e) {
+                items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+            }
+        } else {
+            items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        }
+
+        const savedTheme = localStorage.getItem(THEME_KEY);
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeToggle').textContent = '☀️';
+        }
+    }
+
+    function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function toggleItem(id) {
+        const item = items.find(i => i.id === id);
+        if (item) {
+            item.checked = !item.checked;
+            saveState();
+            render();
+        }
+    }
+
+    function deleteCustomItem(id, event) {
+        event.stopPropagation();
+        items = items.filter(i => i.id !== id);
+        saveState();
+        render();
+    }
+
+    function addCustomItem(name, category) {
+        const newItem = {
+            id: 'custom_' + Date.now(),
+            category: category,
+            name: name.trim(),
+            note: 'נוסף אישית',
+            mandatory: false,
+            checked: false,
+            isCustom: true
+        };
+        items.push(newItem);
+        saveState();
+        render();
+    }
+
+    function updateProgress() {
+        const total = items.length;
+        const packed = items.filter(i => i.checked).length;
+        const percent = total === 0 ? 0 : Math.round((packed / total) * 100);
+
+        document.getElementById('progressPercent').textContent = `${percent}%`;
+        document.getElementById('progressBarFill').style.width = `${percent}%`;
+        document.getElementById('progressCount').textContent = `${packed} מתוך ${total} פריטים נארזו`;
+
+        const mandatoryItems = items.filter(i => i.mandatory);
+        const mandatoryPacked = mandatoryItems.filter(i => i.checked).length;
+        const mandatoryLeft = mandatoryItems.length - mandatoryPacked;
+
+        const mandatoryEl = document.getElementById('mandatoryStatus');
+        if (mandatoryLeft > 0) {
+            mandatoryEl.textContent = `🍀 נותרו ${mandatoryLeft} פריטי חובה`;
+            mandatoryEl.style.color = 'var(--danger)';
+        } else {
+            mandatoryEl.textContent = `🍀 כל פריטי החובה נארזו!`;
+            mandatoryEl.style.color = 'var(--primary)';
+        }
+
+        const celebration = document.getElementById('celebrationBanner');
+        if (total > 0 && packed === total) {
+            celebration.style.display = 'block';
+        } else {
+            celebration.style.display = 'none';
+        }
+    }
+
+    function render() {
+        updateProgress();
+        const container = document.getElementById('categoriesContainer');
+        container.innerHTML = '';
+
+        DEFAULT_CATEGORIES.forEach(cat => {
+            const catItems = items.filter(i => i.category === cat.id);
+            if (catItems.length === 0) return;
+
+            const filteredItems = catItems.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      (item.note && item.note.toLowerCase().includes(searchQuery.toLowerCase()));
+                if (!matchesSearch) return false;
+                if (currentFilter === 'unpacked') return !item.checked;
+                if (currentFilter === 'packed') return item.checked;
+                if (currentFilter === 'mandatory') return item.mandatory;
+                return true;
+            });
+
+            if (filteredItems.length === 0) return;
+
+            const packedInCat = catItems.filter(i => i.checked).length;
+
+            const card = document.createElement('div');
+            card.className = 'category-card';
+
+            const header = document.createElement('div');
+            header.className = 'category-header';
+            header.innerHTML = `
+                <div class="category-title">${cat.title}</div>
+                <div class="category-badge">${packedInCat} / ${catItems.length}</div>
+            `;
+            card.appendChild(header);
+
+            const ul = document.createElement('ul');
+            ul.className = 'items-list';
+
+            filteredItems.forEach(item => {
+                const li = document.createElement('li');
+                li.className = `item-row ${item.checked ? 'checked' : ''}`;
+                li.onclick = () => toggleItem(item.id);
+
+                let badgesHtml = '';
+                if (item.mandatory) {
+                    badgesHtml += `<span class="badge-mandatory">🍀 חובה</span>`;
+                }
+                if (item.subcat) {
+                    badgesHtml += `<span class="badge-subcat">${item.subcat}</span>`;
+                }
+
+                let deleteBtnHtml = '';
+                if (item.isCustom) {
+                    deleteBtnHtml = `<button class="delete-btn" title="מחק פריט" onclick="deleteCustomItem('${item.id}', event)">🗑️</button>`;
+                }
+
+                li.innerHTML = `
+                    <div class="item-left">
+                        <div class="custom-checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-name-line">
+                                <span class="item-name">${item.name}</span>
+                                ${badgesHtml}
+                            </div>
+                            ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
+                        </div>
+                    </div>
+                    ${deleteBtnHtml}
+                `;
+                ul.appendChild(li);
+            });
+
+            card.appendChild(ul);
+            container.appendChild(card);
+        });
+    }
+
+    // Event Listeners
+    document.getElementById('addItemForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = document.getElementById('customItemName');
+        const select = document.getElementById('customItemCategory');
+        if (input.value.trim()) {
+            addCustomItem(input.value, select.value);
+            input.value = '';
+        }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        searchQuery = e.target.value;
+        render();
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.getAttribute('data-filter');
+            render();
+        });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function() {
+        if (confirm('האם לאפס את כל הסימונים ברשימה?')) {
+            items.forEach(i => i.checked = false);
+            saveState();
+            render();
+        }
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', function() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem(THEME_KEY, 'light');
+            this.textContent = '🌙';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem(THEME_KEY, 'dark');
+            this.textContent = '☀️';
+        }
+    });
+
+    document.getElementById('shareWhatsappBtn').addEventListener('click', function() {
+        const total = items.length;
+        const packed = items.filter(i => i.checked).length;
+        const unpacked = items.filter(i => !i.checked);
+
+        let text = `*🎒 עדכון אריזה לטיול השנתי - כיתת חומוס*\n`;
+        text += `ארזתי כבר ${packed} מתוך ${total} פריטים!\n\n`;
+
+        if (unpacked.length === 0) {
+            text += `✅ הכל ארוז ומוכן ליציאה!`;
+        } else {
+            text += `*מה נשאר לי לארוז:*\n`;
+            unpacked.forEach(i => {
+                text += `▫️ ${i.name}${i.mandatory ? ' (חובה 🍀)' : ''}\n`;
+            });
+        }
+
+        navigator.clipboard.writeText(text).then(() => {
+            alert('סיכום האריזה הועתק! אפשר להדביק אותו עכשיו בוואטסאפ.');
+        }).catch(() => {
+            alert('לא ניתן היה להעתיק אוטומטית.');
+        });
+    });
+
+    // Initialize
+    loadState();
+    render();
+</script>
+
+</body>
+</html>
